@@ -1,0 +1,91 @@
+    <!-- src/app/shared/layouts/user-layout/user-layout.component.html -->
+    <div class="user-main-container">
+    <!-- Header fixe -->
+    <header class="user-header">
+        <div class="user-header-content">
+        <!-- Informations du quiz ou page -->
+        <div class="user-quiz-info">
+            <h2 class="user-quiz-title">{{ title }}</h2>
+            <p class="user-quiz-subtitle">{{ subtitle }}</p>
+        </div>
+
+        <!-- Barre de progression horizontale -->
+        <div class="user-progress-container" *ngIf="progress !== null">
+            <div class="user-progress-bar">
+            <div class="user-progress-fill" [style.width.%]="progress"></div>
+            </div>
+            <div class="user-progress-text">
+            <span>{{ progress }}% complété</span>
+            <span>Dernier accès : Aujourd’hui</span>
+            </div>
+        </div>
+
+        <!-- Actions utilisateur (avatar, notifications, etc.) -->
+        <div class="user-header-actions">
+            <app-user-avatar name="Marie Dubois" size="md" class="user-avatar"></app-user-avatar>
+            <button class="btn-menu-mobile" (click)="toggleSidebar()" aria-label="Menu progression">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+            </button>
+        </div>
+        </div>
+    </header>
+
+    <!-- Sidebar de progression (desktop) -->
+    <aside
+        class="user-progress-sidebar"
+        *ngIf="showProgressSidebar"
+    >
+        <div class="user-sidebar-title">Progression du sprint</div>
+
+        <!-- Grille des questions -->
+        <div class="user-question-grid">
+        <div
+            *ngFor="let q of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]"
+            class="user-question-dot"
+            [class.answered]="q % 5 === 0"
+            [class.current]="q === 8"
+            [class.correct]="q % 4 === 0"
+            [class.incorrect]="q % 7 === 0"
+        >
+            {{ q }}
+        </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="user-sidebar-stats">
+        <div class="user-stat-row">
+            <span class="user-stat-label">Réussis</span>
+            <span class="user-stat-value">8/15</span>
+        </div>
+        <div class="user-stat-row">
+            <span class="user-stat-label">Temps passé</span>
+            <span class="user-stat-value">12 min</span>
+        </div>
+        <div class="user-stat-row">
+            <span class="user-stat-label">Score</span>
+            <span class="user-stat-value">78%</span>
+        </div>
+        </div>
+    </aside>
+
+    <!-- Overlay mobile pour fermer le sidebar -->
+    <div
+        class="user-mobile-overlay"
+        *ngIf="sidebarOpen && showProgressSidebar"
+        (click)="toggleSidebar()"
+    ></div>
+
+    <!-- Contenu principal -->
+    <main
+        class="user-quiz-content"
+        [class.full-width]="fullWidth"
+    >
+        <!-- Projection du contenu (header-title, contenu, etc.) -->
+        <ng-content></ng-content>
+        <router-outlet></router-outlet>
+    </main>
+    </div>

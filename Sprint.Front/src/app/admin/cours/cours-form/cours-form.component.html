@@ -1,0 +1,119 @@
+<app-admin-layout>
+  <!-- En-tête -->
+  <div header-title>
+    <h1>{{ isEditMode() ? 'Modifier le cours' : 'Nouveau cours' }}</h1>
+    <p class="admin-subtitle">
+      Liez ce cours à un module, lui-même appartenant à un sprint.
+    </p>
+  </div>
+
+  <!-- Contenu -->
+  <div class="form-container" *ngIf="!loading(); else loader">
+    <form (ngSubmit)="onSubmit()" #form="ngForm">
+      <!-- Titre -->
+      <div class="form-group">
+        <label for="titre">Titre du cours *</label>
+        <input
+          type="text"
+          id="titre"
+          class="form-control"
+          name="titre"
+          [(ngModel)]="cours.titre"
+          required
+          minlength="2"
+          maxlength="150"
+        />
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          class="form-control"
+          name="description"
+          [(ngModel)]="cours.description"
+          rows="4"
+          maxlength="500"
+        ></textarea>
+      </div>
+
+      <!-- Ordre -->
+      <div class="form-group">
+        <label for="ordre">Ordre *</label>
+        <input
+          type="number"
+          id="ordre"
+          class="form-control"
+          name="ordre"
+          [(ngModel)]="cours.ordre"
+          required
+          min="1"
+          placeholder="Ex: 1, 2, 3..."
+        />
+      </div>
+
+      <!-- Sélection du Sprint -->
+      <div class="form-group">
+        <label for="sprint">Sprint (facultatif)</label>
+        <app-search-bar
+          placeholder="Rechercher un sprint..."
+          (search)="onSprintSearch($event)"
+        ></app-search-bar>
+        <select
+          id="sprint"
+          class="form-control"
+          [(ngModel)]="selectedSprintId"
+          name="sprintId"
+          (change)="onSprintChange($any($event).target.value || null)"
+        >
+          <option value="">Aucun sprint</option>
+          @for (s of sprints(); track s.id) {
+            @if (s.nom.toLowerCase().includes(sprintSearchTerm().toLowerCase())) {
+              <option [value]="s.id">{{ s.nom }}</option>
+            }
+          }
+        </select>
+      </div>
+
+      <!-- Sélection du Module -->
+      <div class="form-group">
+        <label for="module">Module *</label>
+        <app-search-bar
+          placeholder="Rechercher un module..."
+          (search)="onModuleSearch($event)"
+        ></app-search-bar>
+        <select
+          id="module"
+          class="form-control"
+          [(ngModel)]="cours.moduleId"
+          name="moduleId"
+          required
+        >
+          <option value="">Sélectionnez un module</option>
+          @for (m of filteredModules(); track m.id) {
+            <option [value]="m.id">{{ m.nom }}</option>
+          }
+        </select>
+        @if (!filteredModules().length) {
+          <small class="text-muted">Aucun module disponible pour ce sprint.</small>
+        }
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" (click)="onCancel()">
+          Annuler
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="loading()">
+          {{ isEditMode() ? 'Mettre à jour' : 'Créer le cours' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loader -->
+  <ng-template #loader>
+    <app-loader></app-loader>
+  </ng-template>
+</app-admin-layout>

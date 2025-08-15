@@ -1,0 +1,85 @@
+<div class="question-form">
+  <!-- En-tête -->
+  <div class="question-header">
+    <h4 class="question-title">Question {{ questionIndex + 1 }}</h4>
+    <button type="button" class="btn btn-sm btn-warning" (click)="onRemove()">×</button>
+  </div>
+
+  <!-- Énoncé -->
+  <div class="form-group">
+    <label>Énoncé *</label>
+    <textarea
+      class="form-control"
+      [(ngModel)]="question.intitule"
+      placeholder="Saisissez l'énoncé de la question"
+      rows="2"
+      required
+    ></textarea>
+  </div>
+
+  <!-- Niveau de difficulté -->
+  <div class="form-group">
+    <label>Difficulté</label>
+    <select
+      class="form-control"
+      [(ngModel)]="question.niveauDifficulte"
+    >
+      <option *ngFor="let diff of [NiveauDifficulte.Facile, NiveauDifficulte.Moyen, NiveauDifficulte.Difficile]"
+              [value]="diff">
+        {{ enumService.getDifficulteMetadata(diff).label }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Explication -->
+  <div class="form-group">
+    <label>Explication (optionnelle)</label>
+    <textarea
+      class="form-control"
+      [(ngModel)]="question.explication"
+      placeholder="Explication après soumission"
+      rows="2"
+    ></textarea>
+  </div>
+
+  <!-- Options de réponse -->
+  <div class="options-section">
+    <h5>Options de réponse</h5>
+
+    <div class="option-item" *ngFor="let option of question.options; let i = index">
+      <!-- Checkbox -->
+      <input
+        type="checkbox"
+        [(ngModel)]="option.estCorrecte"
+      />
+
+      <!-- Texte de l'option -->
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="option.texte"
+        placeholder="Saisissez le texte de l'option"
+        required
+      />
+
+      <!-- Supprimer l'option -->
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="removeOption(i)"
+        *ngIf="question.options.length > 2"
+      >
+        ×
+      </button>
+    </div>
+
+    <!-- Bouton Ajouter une option -->
+    <button
+      type="button"
+      class="btn btn-secondary btn-sm"
+      (click)="addOption()"
+    >
+      + Ajouter une option
+    </button>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+//src/styles/base/_animations.scss
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+@include keyframes(slideUp) {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@include keyframes(logoGlow) {
+  from { filter: drop-shadow(0 0 5px rgba(245, 122, 0, 0.3)); }
+  to { filter: drop-shadow(0 0 15px rgba(245, 122, 0, 0.6)); }
+}
+
+@include keyframes(shake) {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@include keyframes(spin) {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@include keyframes(slideInLeft) {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}

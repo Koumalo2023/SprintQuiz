@@ -1,0 +1,158 @@
+<app-admin-layout>
+  <!-- Fil d'Ariane -->
+  @if (breadcrumbItems(); as items) {
+    <app-breadcrumb [items]="items" />
+  }
+
+  <!-- Titre principal -->
+  <h1 header-title>{{ module()?.nom || 'Chargement...' }}</h1>
+  <p class="admin-subtitle">{{ module()?.description || '' }}</p>
+
+  <!-- Onglets -->
+  <app-tabs
+    [tabs]="[
+      { label: 'Détails' },
+      { label: 'Quiz' },
+      { label: 'Flashcards' },
+      { label: 'Progression' }
+    ]"
+    [activeTab]="activeTab"
+    (tabChange)="onTabChange($event)"
+  />
+
+  <!-- Contenu des onglets -->
+  <div class="tab-content-container">
+    <!-- Onglet 0 : Détails -->
+    @if (activeTab === 0) {
+      <div class="module-details">
+        <div class="module-header-stats">
+          <app-stats-card
+            [value]="(module()?.cours || []).length"
+            label="Cours"
+            icon="book"
+          />
+          <app-stats-card
+            [value]="(module()?.quizzes || []).length"
+            label="Quiz"
+            icon="quiz"
+          />
+          <app-stats-card
+            [value]="(module()?.qaQuestions || []).length"
+            label="Flashcards"
+            icon="flashcard"
+          />
+          <app-stats-card
+            [value]="moduleProgress() + '%'"
+            label="Progression"
+            icon="progress"
+          />
+        </div>
+
+        <div class="module-info">
+          <h3>Informations</h3>
+          <p><strong>Nom :</strong> {{ module()?.nom }}</p>
+          <p><strong>Description :</strong> {{ module()?.description || 'Aucune' }}</p>
+        </div>
+
+        <!-- Liste des cours -->
+        <h3>Cours du module</h3>
+        <app-search-bar
+          placeholder="Rechercher un cours..."
+          (search)="onSearch($event)"
+        />
+        <div class="cards-grid">
+          @if (filteredCours; as coursList) {
+            @for (cours of coursList; track cours.id) {
+              <app-card
+                [title]="cours.titre"
+                [subtitle]="cours.description || ''"
+                [icon]="'icon-course'"
+                [clickable]="true"
+                [routerLink]="'/admin/cours/' + cours.id"
+              />
+            }
+          } @else {
+            <p>Aucun cours trouvé.</p>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Onglet 1 : Quiz -->
+    @if (activeTab === 1) {
+      <div class="module-quizzes">
+        <h3>Quiz du module</h3>
+        <app-search-bar
+          placeholder="Rechercher un quiz..."
+          (search)="onSearch($event)"
+        />
+        <div class="cards-grid">
+          @if (filteredQuizzes; as quizzes) {
+            @for (quiz of quizzes; track quiz.id) {
+              <app-card
+                [title]="quiz.titre"
+                [icon]="'icon-quiz'"
+                [clickable]="true"
+                [routerLink]="'/admin/quiz/' + quiz.id"
+              />
+            }
+          } @else {
+            <p>Aucun quiz disponible.</p>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Onglet 2 : Flashcards -->
+    @if (activeTab === 2) {
+      <div class="module-flashcards">
+        <h3>Flashcards du module</h3>
+        <app-search-bar
+          placeholder="Rechercher une question..."
+          (search)="onSearch($event)"
+        />
+        <div class="cards-grid">
+          @if (filteredFlashcards; as qnas) {
+            @for (qna of qnas; track qna.id) {
+              <app-card
+                [title]="'Q-R #' + qna.id"
+                [subtitle]="qna.question"
+                [icon]="'icon-flashcard'"
+                [clickable]="true"
+                [routerLink]="'/admin/flashcards/' + qna.id"
+              />
+            }
+          } @else {
+            <p>Aucune flashcard disponible.</p>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Onglet 3 : Progression -->
+    @if (activeTab === 3) {
+      <div class="module-progress">
+        <h3>Progression du module</h3>
+        <div class="progress-overview">
+          <app-progress-ring
+            [percent]="moduleProgress()"
+            [size]="'large'"
+            [showLabel]="true"
+          />
+          <div class="progress-stats">
+            <app-stats-card
+              [value]="moduleProgress() + '%'"
+              label="Complété"
+              icon="progress"
+            />
+            <app-stats-card
+              [value]="(module()?.cours?.length || 0) + ' cours'"
+              label="Total"
+              icon="book"
+            />
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</app-admin-layout>

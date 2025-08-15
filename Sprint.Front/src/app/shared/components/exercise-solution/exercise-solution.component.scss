@@ -1,0 +1,48 @@
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+.exercise-solution {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $border-radius-lg;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid $border;
+    color: $dark;
+
+    h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  &__content {
+    line-height: 1.6;
+    color: $dark;
+    white-space: pre-wrap;
+    font-size: 0.95rem;
+  }
+
+  &__empty {
+    text-align: center;
+    color: $gray;
+    font-style: italic;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+}

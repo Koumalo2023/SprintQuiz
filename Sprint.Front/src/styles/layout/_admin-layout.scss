@@ -1,0 +1,224 @@
+//src/styles/styles/_admin-layout.scss
+@use '../abstracts/mixins' as  *;
+@use '../abstracts/variables' as  *;
+// ========================
+// 🎨 LAYOUT ADMINISTRATEUR
+// ========================
+// Layout pour le tableau de bord administrateur
+// Sidebar fixe, header, contenu structuré
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: $light;
+}
+
+.admin-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 280px;
+  height: 100vh;
+  background: $primary;
+  padding: 24px 0;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+
+  &.mobile-hidden {
+    transform: translateX(-100%);
+  }
+}
+
+.admin-sidebar-header {
+  padding: 0 24px 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-logo {
+  font-size: 24px;
+  font-weight: $font-weight-bold;
+  color: #F5E625;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-logo-icon {
+  width: 32px;
+  height: 32px;
+  background: $gradient-accent;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    fill: $primary;
+  }
+}
+
+.admin-role {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
+}
+
+.admin-nav-menu {
+  list-style: none;
+  padding: 32px 0 0;
+}
+
+.admin-nav-section-title {
+  padding: 0 24px 12px;
+  font-size: 12px;
+  font-weight: $font-weight-semibold;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-nav-link {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  color: #FFFFFF;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: $font-weight-regular;
+  transition: all 0.3s ease;
+  position: relative;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #F5E625;
+  }
+
+  &.active {
+    background: rgba(245, 230, 37, 0.2);
+    color: #F5E625;
+    border-right: 3px solid #F5E625;
+  }
+}
+
+.admin-nav-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  fill: currentColor;
+}
+
+.admin-nav-badge {
+  margin-left: auto;
+  background: $danger;
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: $font-weight-bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.admin-main-content {
+  margin-left: 280px;
+  padding: 32px;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+
+  &.full-width {
+    margin-left: 0;
+  }
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+
+  @include respond($breakpoint-md) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+.admin-title-section h1 {
+  font-size: 28px;
+  font-weight: $font-weight-bold;
+  color: $dark;
+  margin-bottom: 8px;
+}
+
+.admin-subtitle {
+  font-size: 14px;
+  color: $gray;
+}
+
+.admin-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: $gradient-primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-weight: $font-weight-bold;
+  font-size: 18px;
+}
+
+.admin-user-details h3 {
+  font-size: 14px;
+  font-weight: $font-weight-semibold;
+  color: $dark;
+}
+
+.admin-user-details p {
+  font-size: 12px;
+  color: $gray;
+}
+
+.admin-mobile-menu-toggle {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+  background: $primary;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.admin-mobile-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+@include respond($breakpoint-md) {
+  .admin-mobile-menu-toggle {
+    display: block;
+  }
+
+  .admin-sidebar.mobile-visible {
+    transform: translateX(0);
+  }
+
+  .admin-main-content {
+    margin-left: 0;
+    padding: 80px 16px 32px;
+  }
+}

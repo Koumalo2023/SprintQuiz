@@ -1,0 +1,64 @@
+// src/app/shared/components/search-bar/search-bar.component.scss
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+@use "sass:color";
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  &__container {
+    position: relative;
+    flex: 1;
+  }
+
+  &__icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: $gray;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    border: 1px solid $border;
+    border-radius: $border-radius-md;
+    font-size: 14px;
+    color: $dark;
+    background: #ffffff;
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    }
+
+    &::placeholder {
+      color: $gray;
+    }
+  }
+
+  &__filter-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: $primary;
+    border: none;
+    border-radius: $border-radius-md;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background 0.3s ease;
+
+    &:hover {
+      background: adjust-color($primary, $lightness: -10%);
+    }
+  }
+}

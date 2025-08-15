@@ -1,0 +1,43 @@
+// src/app/shared/components/breadcrumb/breadcrumb.component.scss
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+.breadcrumb {
+  margin-bottom: 24px;
+  font-size: 14px;
+
+  &-list {
+    @include flex-center-vertical;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-wrap: wrap;
+  }
+
+  &-item {
+    display: flex;
+    align-items: center;
+    color: $gray;
+    white-space: nowrap;
+  }
+
+  &-link {
+    color: $gray;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: $primary;
+    }
+  }
+
+  &-text {
+    color: $dark;
+    font-weight: $font-weight-semibold;
+  }
+
+  &-separator {
+    margin: 0 8px;
+    color: rgba($dark, 0.4);
+  }
+}

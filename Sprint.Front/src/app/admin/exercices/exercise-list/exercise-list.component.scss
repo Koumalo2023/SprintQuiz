@@ -1,0 +1,161 @@
+// src/app/admin/exercises/exercise-list.component.scss
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+.exercise-list-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+  color: $dark;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+// === Stats Grid ===
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+// === Filtres ===
+.filters {
+  display: grid;
+  grid-template-columns: 1fr repeat(3, 180px);
+  gap: 1rem;
+  align-items: end;
+
+  @include respond($breakpoint-lg) {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @include respond($breakpoint-md) {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-group {
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: $dark;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid $border;
+      border-radius: $border-radius;
+      font-size: 1rem;
+    }
+  }
+}
+// Style des <select>
+.filters {
+  .filter-group {
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: $dark;
+    }
+
+    select.form-control {
+      width: 100%;
+      padding: 0.65rem 2.5rem 0.65rem 1rem; // espace pour la flèche à droite
+      border: 1px solid $border;
+      border-radius: $border-radius;
+      font-size: 0.95rem;
+      background-color: $white;
+      color: $dark;
+
+      // Supprimer le style natif
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+
+      // Ajouter une flèche SVG
+      background-image: url("data:image/svg+xml,%3Csvg fill='%23444' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem;
+
+      // Animation & interactions
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: lighten($primary, 15%);
+        box-shadow: 0 0 0 2px rgba($primary, 0.1);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.2);
+      }
+    }
+  }
+}
+
+
+
+.clickable-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.btn {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: $border-radius;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &.btn-primary {
+    background: $primary;
+    color: $white;
+
+    &:hover {
+      background: darken($primary, 10%);
+    }
+  }
+}
+
+// === Liste des exercices ===
+.exercises-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+// === Pagination ===
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+// === Responsive ===
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: $gray;
+  font-style: italic;
+}
+
+.mb-6 { margin-bottom: 1.5rem; }
+.mt-6 { margin-top: 1.5rem; }

@@ -1,0 +1,16 @@
+<!-- src/app/shared/components/breadcrumb/breadcrumb.component.html -->
+<nav class="breadcrumb" aria-label="Fil d'Ariane">
+  <ul class="breadcrumb-list">
+    <li class="breadcrumb-item" *ngFor="let item of items; let last = last">
+      <a *ngIf="item.route && !last" [routerLink]="item.route" class="breadcrumb-link">
+        <i class="icon {{ getMetadata(item)?.icon }}" *ngIf="getMetadata(item)"></i>
+        <span>{{ item.label }}</span>
+      </a>
+      <span *ngIf="(!item.route || last)" class="breadcrumb-text">
+        <i class="icon {{ getMetadata(item)?.icon }}" *ngIf="getMetadata(item)"></i>
+        <span>{{ item.label }}</span>
+      </span>
+      <span class="breadcrumb-separator" *ngIf="!last">›</span>
+    </li>
+  </ul>
+</nav>

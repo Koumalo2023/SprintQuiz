@@ -1,0 +1,71 @@
+//styles/abstracts/_variables.scss
+@use 'sass:color';
+// Couleurs
+$primary: #336699;
+$secondary: #6F42C1;
+$accent: #F57A00;
+$accent-dark: #EB6864;
+$success: #22B24C;
+$warning: #FFC107;
+$danger: #EB6864;
+$info: #17a2b8;
+$light: #f8f9fa;         // Fond principal
+$lighter: #f1f3f5;       // Fond légèrement plus clair, pour les zones secondaires
+$white: #ffffff;
+$dark: #212529;
+$gray: #ADB5BD; 
+$gray-dark: #333333;
+$border: #DEE2E6;
+
+
+// Couleurs en mode sombre
+$dark-bg: #121212;
+$dark-surface: #1E1E1E;
+$dark-text: #E0E0E0;
+$dark-text-secondary: #B0B0B0;
+$dark-border: #333333;
+
+// Typographie
+$font-family: 'Montserrat', sans-serif;
+$font-size-root: 16px;
+$font-weight-light: 400;
+$font-weight-regular: 500;
+$font-weight-medium:900;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Espacements
+$spacer: 1rem;
+$spacer-sm: 0.5rem;
+$spacer-lg: 2rem;
+
+// Bordures
+$border-radius-sm: 4px;
+$border-radius-md:6px;
+$border-radius: 12px;
+$border-radius-lg: 16px;
+$border-width: 1px;
+$border-light:#f1f3f5;
+
+// Ombres
+$box-shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
+$box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+$box-shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.15);
+
+// Gradients
+$gradient-primary: linear-gradient(135deg, $primary 0%, $secondary 100%);
+$gradient-accent: linear-gradient(135deg, $accent, $accent-dark);
+$gradient-success: linear-gradient(135deg, $success, color.adjust($success, $lightness:10%));
+
+$gradient-sprint: linear-gradient(135deg, $success, color.adjust($primary, $lightness:10%));
+$gradient-module: linear-gradient(135deg, $success, color.adjust($secondary, $lightness:10%));
+$gradient-cours:  linear-gradient(135deg, $success, color.adjust($accent, $lightness:10%));
+
+
+
+$gradient-info: linear-gradient(135deg, $primary, $secondary);
+
+// Breakpoints
+$breakpoint-sm: 480px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;

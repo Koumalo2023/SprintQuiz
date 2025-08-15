@@ -1,0 +1,26 @@
+<article class="exercise-card">
+  <!-- Header : Type + Niveau -->
+  <div class="exercise-card__header">
+    <span class="badge" [ngClass]="typeMeta?.class">{{ typeMeta?.label }}</span>
+    <span class="badge" [ngClass]="niveauMeta?.class">{{ niveauMeta?.label }}</span>
+  </div>
+
+  <!-- Enoncé -->
+  <h3 class="exercise-card__title">{{ truncatedEnonce }}</h3>
+
+  <!-- Badges secondaires -->
+  <div class="exercise-card__meta">
+    <span class="badge badge-sm" [style.background]="difficulteMeta?.color">
+      <i class="icon {{ difficulteMeta?.icon }}"></i>
+      {{ difficulteMeta?.label }}
+    </span>
+    <span class="exercise-card__tags" *ngIf="tagsDisplay">
+  <i class="icon tag"></i> {{ tagsDisplay }}
+</span>
+  </div>
+
+  <!-- Statut (optionnel) -->
+  <div class="exercise-card__status" *ngIf="showStatus">
+    <span class="status-badge status--in-progress">À revoir</span>
+  </div>
+</article>

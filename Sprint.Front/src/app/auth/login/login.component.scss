@@ -1,0 +1,178 @@
+//src/app/auth/login/login.component.scss
+
+// Utilise les styles globaux
+@use 'layout/auth-layout';
+@use '../../../styles/abstracts/variables' as *;
+@use '../../../styles/abstracts/mixins' as *;
+@use '../../../styles/components/forms';
+
+// Styles spécifiques au login
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .logo {
+    font-size: 32px;
+    font-weight: 700;
+    background: $gradient-accent;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    animation: logoGlow 2s ease-in-out infinite alternate;
+  }
+
+  .login-title {
+    font-size: 24px;
+    font-weight: $font-weight-semibold;
+    color: $dark;
+    margin-bottom: 8px;
+  }
+
+  .login-subtitle {
+    font-size: 14px;
+    color: $gray;
+  }
+}
+
+
+
+@keyframes logoGlow {
+  from { filter: drop-shadow(0 0 5px rgba(245, 122, 0, 0.3)); }
+  to { filter: drop-shadow(0 0 15px rgba(245, 122, 0, 0.6)); }
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+// --- Gestion des icônes dans les champs --- //
+.input-with-icon {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.input-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  fill: $gray;
+  pointer-events: none;
+  transition: fill 0.3s ease;
+  z-index: 1;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px 40px 16px 16px; // ← Ajout de 40px à droite pour laisser de la place à l'icône
+  border: $border-width solid $border;
+  border-radius: $border-radius;
+  font-size: 16px;
+  font-family: $font-family;
+  background: #FFFFFF;
+  color: $dark;
+  transition: all 0.3s ease;
+
+  &::placeholder {
+    color: $gray;
+  }
+
+  &:focus {
+    @include input-focus;
+    + .input-icon {
+      fill: $accent;
+    }
+  }
+}
+
+.remember-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.forgot-password {
+  color: $primary;
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: $accent;
+    text-decoration: underline;
+  }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 24px 0;
+  color: $gray;
+  font-size: 12px;
+
+  &::before, &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: $border;
+  }
+
+  &::before { margin-right: 16px; }
+  &::after { margin-left: 16px; }
+}
+
+.register-link {
+  color: $accent;
+  font-weight: $font-weight-semibold;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.login-button {
+  @include button-gradient($gradient-accent);
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .loading {
+    @include loading-spinner(20px, #FFFFFF);
+  }
+}
+
+// Responsive
+@media (max-width: $breakpoint-sm) {
+  .login-header {
+    .logo { font-size: 28px; }
+    .login-title { font-size: 20px; }
+  }
+
+  .login-form {
+    .form-input {
+      padding: 14px 16px;
+      font-size: 16px;
+    }
+  }
+
+  .login-button {
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+}

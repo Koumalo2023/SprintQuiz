@@ -1,0 +1,19 @@
+<section class="exercise-solution">
+  <header class="exercise-solution__header">
+    <h3><i class="icon check-circle"></i> Solution détaillée</h3>
+    <span class="badge badge-sm" [ngClass]="getTypeClass()">
+      {{ getTypeLabel() }}
+    </span>
+  </header>
+
+  <div class="exercise-solution__content" *ngIf="exercice.solution; else noSolution">
+    <p>{{ exercice.solution }}</p>
+  </div>
+
+  <ng-template #noSolution>
+    <div class="exercise-solution__empty">
+      <i class="icon info"></i>
+      <span>Aucune solution fournie.</span>
+    </div>
+  </ng-template>
+</section>

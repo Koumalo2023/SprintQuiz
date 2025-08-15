@@ -1,0 +1,44 @@
+//styles/abstracts/_functions.scss
+
+@use 'sass:color';
+// Fonction pour calculer un pourcentage
+@function percent($value, $total) {
+  @return ($value / $total) * 100%;
+}
+
+// Fonction pour ajuster la luminosité
+@function lighten($color, $amount) {
+  @return mix(white, $color, $amount);
+}
+
+@function darken($color, $amount) {
+  @return mix(black, $color, $amount);
+}
+
+// Fonction pour générer une opacité
+@function alpha($color, $alpha) {
+  @return rgba($color, $alpha);
+}
+
+
+//styles/abstracts/_functions.scss
+
+@use 'sass:color';
+// Fonction pour calculer un pourcentage
+@function percent($value, $total) {
+  @return ($value / $total) * 100%;
+}
+
+// Fonction pour ajuster la luminosité
+@function lighten($color, $amount) {
+  @return mix(white, $color, $amount);
+}
+
+@function darken($color, $amount) {
+  @return mix(black, $color, $amount);
+}
+
+// Fonction pour générer une opacité
+@function alpha($color, $alpha) {
+  @return rgba($color, $alpha);
+}

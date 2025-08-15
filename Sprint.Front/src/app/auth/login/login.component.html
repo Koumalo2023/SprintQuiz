@@ -1,0 +1,89 @@
+<!-- src/app/auth/login/login.component.html -->
+<app-auth-layout>
+  <div class="login-container">
+    <!-- Header -->
+    <div class="login-header">
+      <div class="logo">SprintQuiz</div>
+      <h1 class="login-title">Bon retour !</h1>
+      <p class="login-subtitle">Connectez-vous pour continuer votre apprentissage</p>
+    </div>
+
+    <!-- Message d'erreur -->
+    @if (errorMessage) {
+      <div class="error-message show" role="alert">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Formulaire -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email" class="form-label">Adresse email</label>
+        <div class="input-with-icon">
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-input"
+            placeholder="votre@email.com"
+            [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+          />
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Mot de passe -->
+      <div class="form-group">
+        <label for="password" class="form-label">Mot de passe</label>
+        <div class="input-with-icon">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'motDePasse'"
+            formControlName="motDePasse"
+            class="form-input"
+            placeholder="••••••••"
+            [class.error]="loginForm.get('motDePasse')?.invalid && loginForm.get('motDePasse')?.touched"
+          />
+          <svg (click)="togglePassword()" class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Rester connecté -->
+      <div class="remember-group">
+        <label class="custom-checkbox">
+          <input type="checkbox" />
+          <span class="checkmark"></span>
+        </label>
+        <span class="remember-label">Se souvenir de moi</span>
+      </div>
+
+      <!-- Bouton -->
+      <button
+        type="submit"
+        class="login-button"
+        [disabled]="isLoading || loginForm.invalid"
+        [class.loading]="isLoading"
+      >
+        @if (isLoading) {
+          <span>Connexion en cours...</span>
+          <div class="loading"></div>
+        } @else {
+          Se connecter
+        }
+      </button>
+    </form>
+
+    <!-- Liens -->
+    <div class="login-links">
+      <a (click)="onForgotPassword()" class="forgot-password">Mot de passe oublié ?</a>
+      <div class="divider">OU</div>
+      <a routerLink="/auth/register" class="register-link">Pas encore de compte ? S'inscrire</a>
+    </div>
+  </div>
+</app-auth-layout>

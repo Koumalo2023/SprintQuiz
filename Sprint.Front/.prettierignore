@@ -1,0 +1,7 @@
+# Ne pas formater ces fichiers
+node_modules/
+dist/
+*.min.js
+*.md
+*.json
+.angular/

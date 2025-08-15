@@ -1,0 +1,54 @@
+<app-admin-layout>
+  <!-- Titre principal -->
+  <h1 header-title>Liste des Quiz</h1>
+  <p class="admin-subtitle">Gérez les quiz de la plateforme par module, cours ou sprint.</p>
+
+  <!-- Recherche + Bouton d'action -->
+  <div class="admin-header-actions">
+    <app-search-bar
+      placeholder="Rechercher un quiz, un module, un cours..."
+      (search)="onSearch($event)"
+    />
+    <a class="btn btn-primary" routerLink="create">
+      + Nouveau Quiz
+    </a>
+  </div>
+
+  <!-- Grille des quiz -->
+  <div class="cards-grid">
+    @for (vm of getPaginatedQuizzes(); track vm.quiz.id) {
+      <app-card
+        [title]="vm.quiz.titre"
+        [subtitle]="vm.quiz.description || ''"
+        [icon]="'icon-quiz'"
+        [footer]="vm.contextType === 'autre' ? 'Aucun contexte' : (vm.contextType === 'sprint' ? 'Sprint' : (vm.contextType === 'module' ? 'Module' : 'Cours')) + ' : ' + vm.contextNom"
+        [progress]="vm.tauxReussiteGlobal"
+        [clickable]="true"
+        (cardClick)="onCardClick(vm.quiz)"
+      >
+        <small>Questions : {{ vm.quiz.questions?.length || 0 }} | Tentatives : {{ vm.quiz.tentativesQuiz?.length || 0 }}</small>
+      </app-card>
+    }
+  </div>
+
+  <!-- Pagination -->
+  @if (totalPages() > 1) {
+    <app-pagination
+      [currentPage]="currentPage()"
+      [totalPages]="totalPages()"
+      (pageChange)="onPageChange($event)"
+    />
+  }
+
+  <!-- Aucun résultat -->
+  @if (filteredQuizzes().length === 0) {
+    <div class="no-results">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <p>Aucun quiz trouvé.</p>
+    </div>
+  }
+</app-admin-layout>

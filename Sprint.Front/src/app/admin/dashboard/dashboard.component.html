@@ -1,0 +1,265 @@
+<!-- src/app/admin/dashboard/dashboard.component.html -->
+ 
+<app-admin-layout>
+
+   <!-- Breadcrumb -->
+  <app-breadcrumb [items]="breadcrumbItems" class="breadcrumb-admin"></app-breadcrumb>
+  <!-- Titre principal -->
+  <h1 header-title>Tableau de bord Admin</h1>
+  <p class="admin-subtitle">Vue d'ensemble de la plateforme SprintQuiz</p>
+
+<!-- Barre de recherche -->
+  <app-search-bar
+    placeholder="Rechercher un utilisateur, un quiz, un cours..."
+    [showFilters]="true"
+    (search)="onSearch($event)"
+    class="search-bar-dashboard"
+  ></app-search-bar>
+ 
+  <!-- Statistiques principales -->
+  <div class="admin-stats-grid">
+    <!-- Utilisateurs actifs -->
+    <div class="admin-stat-card users">
+      <div class="admin-stat-header">
+        <div class="admin-stat-icon users">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M16 7c0-2.21-1.79-4-4-4S8 4.79 8 7s1.79 4 4 4 4-1.79 4-4zm-4 6c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <button class="admin-stat-menu-button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="admin-stat-value">1247</div>
+      <div class="admin-stat-label">Utilisateurs actifs</div>
+      <div class="admin-stat-trend positive">
+        <svg class="admin-trend-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        +12% ce mois
+      </div>
+    </div>
+
+
+    <!-- Quiz non corrigés -->
+    <div class="admin-stat-card quiz">
+      <div class="admin-stat-header">
+        <div class="admin-stat-icon quiz">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <button class="admin-stat-menu-button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="admin-stat-value">23</div>
+      <div class="admin-stat-label">Quiz non corrigés</div>
+      <div class="admin-stat-trend neutral">
+        <svg class="admin-trend-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        +5 aujourd’hui
+      </div>
+    </div>
+
+    <!-- Progression moyenne -->
+    <div class="admin-stat-card progress">
+      <div class="admin-stat-header">
+        <div class="admin-stat-icon progress">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <button class="admin-stat-menu-button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="admin-stat-value">73%</div>
+      <div class="admin-stat-label">Progression moyenne</div>
+      <div class="admin-stat-trend positive">
+        <svg class="admin-trend-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        +8%
+      </div>
+    </div>
+
+    <!-- Contenus publiés -->
+    <div class="admin-stat-card content">
+      <div class="admin-stat-header">
+        <div class="admin-stat-icon content">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <button class="admin-stat-menu-button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="admin-stat-value">156</div>
+      <div class="admin-stat-label">Contenus publiés</div>
+      <div class="admin-stat-trend neutral">stable</div>
+    </div>
+  </div>
+
+  <!-- Statistiques principales -->
+  <div class="admin-stats-grid">
+    <app-stats-card
+      *ngFor="let stat of stats"
+      [value]="stat.value"
+      [label]="stat.title"
+      [icon]="stat.icon"
+      [trend]="stat.trend"
+      [trendValue]="stat.trend"
+    ></app-stats-card>
+  </div>
+  
+  <!-- Accès rapide -->
+  <div class="admin-quick-actions">
+    <h2 class="admin-section-title">Accès rapide</h2>
+    <div class="admin-actions-grid">
+      <a href="#" class="admin-action-card">
+        <div class="admin-action-icon users">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zM4 18v-4h3v4h2v-7.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V18h2v-4h3v4h4V6H2v12h2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="admin-action-info">
+          <h3>Gestion utilisateurs</h3>
+          <p>Ajouter, modifier, supprimer</p>
+        </div>
+      </a>
+      <a href="#" class="admin-action-card">
+        <div class="admin-action-icon content">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="admin-action-info">
+          <h3>Gestion contenus</h3>
+          <p>Sprints, modules, cours</p>
+        </div>
+      </a>
+      <a href="#" class="admin-action-card">
+        <div class="admin-action-icon reports">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5-12h-15l-.5.5v15l.5.5h15l.5-.5v-15l-.5-.5zm-15-1c-1.1 0-2 .9-2 2v15c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2v-15c0-1.1-.9-2-2-2h-15z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="admin-action-info">
+          <h3>Rapports</h3>
+          <p>Statistiques détaillées</p>
+        </div>
+      </a>
+      <a href="#" class="admin-action-card">
+        <div class="admin-action-icon settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41L14.75,18.65c0.59-0.24,1.12-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.48-0.12-0.61l-2.03-1.58C19.16,13.58,19.14,13.27,19.14,12.94z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="admin-action-info">
+          <h3>Paramètres</h3>
+          <p>Configuration système</p>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Activités et notifications -->
+  <div class="admin-activities">
+    <!-- Dernières activités -->
+    <div>
+      
+      <h2 class="admin-section-title">Dernières activités</h2>
+      <div class="admin-activity-card">
+        <div class="admin-activity-item">
+          <div class="admin-activity-avatar">MD</div>
+          <div class="admin-activity-content">
+            <div class="admin-activity-text">Marie Dubois a terminé le Sprint 2</div>
+            <div class="admin-activity-time">Il y a 5 minutes</div>
+          </div>
+          <div class="admin-activity-status completed">Terminé</div>
+        </div>
+        <div class="admin-activity-item">
+          <div class="admin-activity-avatar">JM</div>
+          <div class="admin-activity-content">
+            <div class="admin-activity-text">Jean Martin a créé un nouveau quiz</div>
+            <div class="admin-activity-time">Il y a 12 minutes</div>
+          </div>
+          <div class="admin-activity-status pending">En attente</div>
+        </div>
+        <div class="admin-activity-item">
+          <div class="admin-activity-avatar">SL</div>
+          <div class="admin-activity-content">
+            <div class="admin-activity-text">Sophie Leroy s'est inscrite</div>
+            <div class="admin-activity-time">Il y a 25 minutes</div>
+          </div>
+          <div class="admin-activity-status completed">Validé</div>
+        </div>
+        <div class="admin-activity-item">
+          <div class="admin-activity-avatar">PD</div>
+          <div class="admin-activity-content">
+            <div class="admin-activity-text">Pierre Durand a échoué au Quiz Physique</div>
+            <div class="admin-activity-time">Il y a 1 heure</div>
+          </div>
+          <div class="admin-activity-status failed">Échec</div>
+        </div>
+        <div class="admin-activity-item">
+          <div class="admin-activity-avatar">AL</div>
+          <div class="admin-activity-content">
+            <div class="admin-activity-text">Anne Lefebvre a obtenu un badge</div>
+            <div class="admin-activity-time">Il y a 2 heures</div>
+          </div>
+          <div class="admin-activity-status completed">Badge</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="admin-notifications">
+      <h2 class="admin-section-title">Notifications</h2>
+      <div class="admin-notification-item">
+        <div class="admin-notification-icon alert">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="admin-notification-content">
+          <div class="admin-notification-text">5 quiz en attente de validation</div>
+          <div class="admin-notification-time">Il y a 10 minutes</div>
+        </div>
+      </div>
+      <div class="admin-notification-item">
+        <div class="admin-notification-icon info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="admin-notification-content">
+          <div class="admin-notification-text">Mise à jour système disponible</div>
+          <div class="admin-notification-time">Il y a 2 heures</div>
+        </div>
+      </div>
+      <div class="admin-notification-item">
+        <div class="admin-notification-icon success">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="admin-notification-content">
+          <div class="admin-notification-text">Sauvegarde automatique réussie</div>
+          <div class="admin-notification-time">Il y a 6 heures</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-admin-layout>

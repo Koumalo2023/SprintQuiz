@@ -1,0 +1,166 @@
+<app-admin-layout>
+  <h1 header-title>{{ isEditMode() ? 'Modifier' : 'Nouveau' }} Quiz</h1>
+  <p class="admin-subtitle">Associez un quiz à un Sprint, un Module ou un Cours.</p>
+
+  <!-- Mode groupé -->
+  <div class="bulk-toggle mb-6">
+    <label class="checkbox-label">
+      <input type="checkbox" (change)="toggleBulkMode()" />
+      Création groupée (via JSON)
+    </label>
+  </div>
+
+  <!-- Upload JSON -->
+  @if (isBulkMode) {
+    <div class="form-group mb-6">
+      <label>Importer depuis un fichier JSON</label>
+      <input
+        type="file"
+        accept=".json"
+        (change)="onFileSelected($event)"
+        class="form-control"
+      />
+      <small class="text-muted">
+        Format attendu : tableau d'objets <code>{{ '{' }} "quiz": {{ '{' }}"titre", "niveau", "niveauId" {{ '}' }}, "questions": [...] {{ '}' }}</code>
+      </small>
+    </div>
+  }
+
+  <div class="form-container" *ngIf="!loading(); else loader">
+    <form (ngSubmit)="onSubmit()" #quizForm="ngForm">
+      <!-- Niveau de rattachement -->
+      <div class="form-group mb-4">
+        <label>Niveau de rattachement *</label>
+        <div class="radio-group">
+          @for (niveau of [NiveauEnum.Sprint, NiveauEnum.Module, NiveauEnum.Cours]; track $index) {
+            <label class="radio-label">
+              <input
+                type="radio"
+                name="niveau"
+                [value]="niveau"
+                [(ngModel)]="quiz().niveau"
+                (change)="onNiveauChange()"
+              />
+              {{ enumService.getNiveauLabel(niveau) }}
+            </label>
+          }
+        </div>
+      </div>
+
+      <!-- Sélection du Sprint -->
+      <div class="form-group mb-4">
+        <label>Sprint *</label>
+        <select
+          class="form-control"
+          [(ngModel)]="selectedSprintId"
+          (ngModelChange)="loadModules($event)"
+          name="sprintId"
+          required
+        >
+          <option value="" disabled>Sélectionner un sprint</option>
+          @for (sprint of sprints(); track sprint.id) {
+            <option [value]="sprint.id">{{ sprint.nom }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Sélection du Module -->
+      @if (quiz().niveau === NiveauEnum.Module || quiz().niveau === NiveauEnum.Cours) {
+        <div class="form-group mb-4">
+          <label>Module *</label>
+          <select
+            class="form-control"
+            [(ngModel)]="selectedModuleId"
+            (ngModelChange)="loadCours($event)"
+            [disabled]="modules().length === 0"
+            name="moduleId"
+            required
+          >
+            <option value="" disabled>
+              @if (modules().length > 0) { Sélectionner un module } @else { Aucun module disponible }
+            </option>
+            @for (module of modules(); track module.id) {
+              <option [value]="module.id">{{ module.nom }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <!-- Sélection du Cours -->
+      @if (quiz().niveau === NiveauEnum.Cours) {
+        <div class="form-group mb-4">
+          <label>Cours *</label>
+          <select
+            class="form-control"
+            [(ngModel)]="quiz().niveauId"
+            name="coursId"
+            required
+          >
+            <option value="" disabled>
+              @if (cours().length > 0) { Sélectionner un cours } @else { Aucun cours disponible }
+            </option>
+            @for (c of cours(); track c.id) {
+              <option [value]="c.id">{{ c.titre }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <!-- Titre du quiz -->
+      @if (!isBulkMode) {
+        <div class="form-group mb-4">
+          <label>Titre du Quiz *</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="quiz().titre"
+            name="titre"
+            required
+            maxlength="100"
+          />
+        </div>
+
+        <!-- Description -->
+        <div class="form-group mb-4">
+          <label>Description</label>
+          <textarea
+            class="form-control"
+            [(ngModel)]="quiz().description"
+            name="description"
+            rows="3"
+            maxlength="500"
+          ></textarea>
+        </div>
+
+        <!-- Questions -->
+        <div class="questions-section mb-6">
+          <h3 class="text-lg font-semibold text-dark mb-4">Questions</h3>
+          @for (question of questions(); track $index) {
+            <div class="question-item bg-lighter p-5 rounded-lg border border-border mb-4">
+              <app-quiz-question-form
+                [question]="question"
+                [questionIndex]="$index"
+                (removeQuestion)="removeQuestion($index)"
+              ></app-quiz-question-form>
+            </div>
+          }
+          <button type="button" (click)="addQuestion()" class="btn btn-secondary text-sm px-3 py-1">
+            + Ajouter une question
+          </button>
+        </div>
+      }
+
+      <!-- Bouton unique -->
+      <div class="form-actions mt-6">
+        <button type="button" class="btn btn-outline" (click)="onCancel()">Annuler</button>
+        <button type="submit" class="btn btn-primary" [disabled]="loading()">
+          {{ isBulkMode ? 'Importer' : (isEditMode() ? 'Mettre à jour' : 'Créer') }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <ng-template #loader>
+    <app-loader></app-loader>
+  </ng-template>
+</app-admin-layout>

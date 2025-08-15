@@ -1,0 +1,10 @@
+<div class="exercise-step">
+  <header class="exercise-step__header" *ngIf="showNumber">
+    <span class="exercise-step__number">{{ step.ordre + 1 }}</span>
+    <h4>Étape {{ step.ordre + 1 }}</h4>
+  </header>
+
+  <div class="exercise-step__body">
+    <p>{{ step.description }}</p>
+  </div>
+</div>

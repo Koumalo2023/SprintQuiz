@@ -1,0 +1,10 @@
+<div class="stats-card" [style.background]="bgColor" [style.color]="textColor">
+  <div class="stats-card__icon">{{ icon }}</div>
+  <div class="stats-card__value">{{ value }}</div>
+  <div class="stats-card__label">{{ label }}</div>
+  @if (trend) {
+    <div class="stats-card__trend" [class.up]="trend === 'up'" [class.down]="trend === 'down'">
+      {{ trendValue }}
+    </div>
+  }
+</div>

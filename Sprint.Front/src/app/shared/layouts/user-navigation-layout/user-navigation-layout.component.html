@@ -1,0 +1,73 @@
+<div class="user-nav-layout">
+  <!-- Sidebar de navigation -->
+  <aside class="user-nav-sidebar" [class.mobile-active]="sidebarOpen" [class.mobile-hidden]="!sidebarOpen">
+    <!-- En-tête du sidebar -->
+    <div class="user-nav-sidebar-header">
+      <div class="user-nav-logo">
+        <span class="user-nav-logo-icon">📚</span>
+        <span class="user-nav-logo-text">SprintQuiz</span>
+      </div>
+      <div class="user-nav-role">Étudiant</div>
+    </div>
+
+    <!-- Menu de navigation -->
+    <nav class="user-nav-menu">
+      <ul class="user-nav-menu-list">
+        <li class="user-nav-menu-item">
+          <a routerLink="/student" class="user-nav-menu-link" [class.active]="true" (click)="closeSidebar()">
+            <span class="user-nav-menu-icon">🏠</span>
+            <span class="user-nav-menu-label">Accueil</span>
+          </a>
+        </li>
+        <li class="user-nav-menu-item">
+          <a routerLink="/student/sprints" class="user-nav-menu-link" (click)="closeSidebar()">
+            <span class="user-nav-menu-icon">🏁</span>
+            <span class="user-nav-menu-label">Sprints</span>
+          </a>
+        </li>
+        <li class="user-nav-menu-item">
+          <a routerLink="/student/progression" class="user-nav-menu-link" (click)="closeSidebar()">
+            <span class="user-nav-menu-icon">📊</span>
+            <span class="user-nav-menu-label">Progression</span>
+          </a>
+        </li>
+        <li class="user-nav-menu-item">
+          <a routerLink="/student/stats" class="user-nav-menu-link" (click)="closeSidebar()">
+            <span class="user-nav-menu-icon">📈</span>
+            <span class="user-nav-menu-label">Statistiques</span>
+          </a>
+        </li>
+        <li class="user-nav-menu-item">
+          <a routerLink="/student/profile" class="user-nav-menu-link" (click)="closeSidebar()">
+            <span class="user-nav-menu-icon">👤</span>
+            <span class="user-nav-menu-label">Profil</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Overlay mobile -->
+  <div class="user-nav-mobile-overlay" *ngIf="sidebarOpen" (click)="closeSidebar()"></div>
+
+  <!-- En-tête principal -->
+  <header class="user-nav-header">
+    <button class="user-nav-toggle" (click)="toggleSidebar()" aria-label="Ouvrir le menu">
+      ☰
+    </button>
+
+    <h1 class="user-nav-title">
+      <ng-content select="[header-title]"></ng-content>
+    </h1>
+
+    <div class="user-nav-actions">
+      <app-user-avatar [name]="user.name" [imageUrl]="user.avatar" size="md" class="user-nav-avatar"></app-user-avatar>
+    </div>
+  </header>
+
+  <!-- Contenu principal -->
+  <main class="user-nav-content" [class.full-width]="fullWidth">
+    <ng-content></ng-content>
+    <router-outlet></router-outlet>
+  </main>
+</div>

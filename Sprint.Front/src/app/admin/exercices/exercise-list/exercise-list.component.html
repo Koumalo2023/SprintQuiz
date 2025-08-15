@@ -1,0 +1,116 @@
+<app-admin-layout>
+  <div class="exercise-list-container">
+    <!-- HEADER -->
+    <header class="admin-header">
+      <div class="admin-title-section">
+        <h1>Gestion des Exercices</h1>
+        <p class="admin-subtitle">
+          Créez, modifiez et suivez les exercices pédagogiques structurés par niveau.
+        </p>
+      </div>
+
+      <!-- Bouton Créer -->
+      <a class="btn btn-primary" routerLink="create">
+        + Nouvel exercice
+      </a>
+    </header>
+
+    <!-- Stats Globales -->
+    <section class="stats-grid mb-6">
+      <app-stats-card title="Total" [value]="totalExercises()" icon="📝" [bgColor]="'#f8f9fa'"
+        [textColor]="'#212529'" />
+
+      <app-stats-card title="Sprints" [value]="statsByNiveau()[NiveauEnum.Sprint] || 0" icon="📅"
+        [bgColor]="enumService.getNiveauMetadata(NiveauEnum.Sprint)?.color || '#4cc9f0'" textColor="white" />
+
+      <app-stats-card title="Modules" [value]="statsByNiveau()[NiveauEnum.Module] || 0" icon="🗂️"
+        [bgColor]="enumService.getNiveauMetadata(NiveauEnum.Module)?.color || '#f72585'" textColor="white" />
+
+      <app-stats-card title="Cours" [value]="statsByNiveau()[NiveauEnum.Cours] || 0" icon="📘"
+        [bgColor]="enumService.getNiveauMetadata(NiveauEnum.Cours)?.color || '#4361ee'" textColor="white" />
+    </section>
+
+    <!-- Filtres et Recherche -->
+    <section class="filters mb-6">
+      <div class="filter-row">
+        <!-- Barre de recherche -->
+        <app-search-bar placeholder="Rechercher un énoncé ou un tag..." (search)="onSearchChange($event)"
+          class="flex-1">
+        </app-search-bar>
+
+        <!-- Filtre par niveau -->
+        <div class="filter-group">
+          <label for="filter-niveau">Niveau</label>
+          <select id="filter-niveau" class="form-control" [ngModel]="selectedNiveau()"
+            (ngModelChange)="selectedNiveau.set($event)">
+            <option [ngValue]="null">Tous les niveaux</option>
+            <option *ngFor="let niveau of [NiveauEnum.Sprint, NiveauEnum.Module, NiveauEnum.Cours]" [ngValue]="niveau">
+              {{ enumService.getNiveauLabel(niveau) }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Filtre par difficulté -->
+        <div class="filter-group">
+          <label for="filter-difficulte">Difficulté</label>
+          <select id="filter-difficulte" class="form-control" [ngModel]="selectedDifficulte()"
+            (ngModelChange)="selectedDifficulte.set($event)">
+            <option [ngValue]="null">Toutes les difficultés</option>
+            <option *ngFor="let diff of [NiveauDifficulte.Facile, NiveauDifficulte.Moyen, NiveauDifficulte.Difficile]"
+              [ngValue]="diff">
+              {{ enumService.getDifficulteMetadata(diff).label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Filtre par type -->
+        <div class="filter-group">
+          <label for="filter-type">Type</label>
+          <select id="filter-type" class="form-control" [ngModel]="selectedType()"
+            (ngModelChange)="selectedType.set($event)">
+            <option [ngValue]="null">Tous les types</option>
+            <option
+              *ngFor="let type of [TypeExercice.Basique, TypeExercice.Applique, TypeExercice.Analyse, TypeExercice.Cas, TypeExercice.Defi]"
+              [ngValue]="type">
+              {{ enumService.getTypeExerciceMetadata(type).label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Bouton reset -->
+        <div class="filter-group align-end">
+          <button class="btn btn-secondary" (click)="resetFilters()">Réinitialiser</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Liste des Exercices -->
+    <main class="exercises-grid" *ngIf="!loading(); else loader">
+      <ng-container *ngIf="paginatedExercises().length > 0; else noResults">
+        <div *ngFor="let ex of paginatedExercises(); trackBy: trackById" class="clickable-card"
+          (click)="onCardClick(ex)" [attr.aria-label]="getAriaLabel(ex)">
+          <app-exercise-card [exercice]="ex"></app-exercise-card>
+        </div>
+      </ng-container>
+    </main>
+
+    <!-- Message aucun résultat -->
+    <ng-template #noResults>
+      <p class="text-center text-muted">
+        Aucun exercice ne correspond aux critères de recherche ou de filtre.
+      </p>
+    </ng-template>
+
+    <!-- Pagination -->
+    <footer class="pagination-container mt-6" *ngIf="getTotalPages() > 1">
+      <app-pagination [currentPage]="currentPage()" [totalPages]="getTotalPages()" [maxVisiblePages]="5"
+        (pageChange)="onPageChange($event)">
+      </app-pagination>
+    </footer>
+
+    <!-- Loader -->
+    <ng-template #loader>
+      <app-loader message="Chargement des exercices..."></app-loader>
+    </ng-template>
+  </div>
+</app-admin-layout>

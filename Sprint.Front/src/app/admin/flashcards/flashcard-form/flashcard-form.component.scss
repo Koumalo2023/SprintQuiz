@@ -1,0 +1,233 @@
+// src/app/admin/flashcards/flashcard-form.component.scss
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+// === Conteneur principal ===
+.form-container {
+  max-width: 800px;
+  margin: 24px auto;
+  padding: 32px;
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow;
+  animation: slideUp 0.6s ease-out both;
+}
+
+// === Sous-titre ===
+.admin-subtitle {
+  color: $gray;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+// === Mode groupé (bulk) ===
+.bulk-toggle {
+  margin-bottom: 24px;
+  label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: $font-weight-semibold;
+    cursor: pointer;
+    user-select: none;
+  }
+  input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: $primary;
+  }
+}
+
+// === Groupe de formulaire ===
+.form-group {
+  margin-bottom: 24px;
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: $font-weight-semibold;
+    color: $dark;
+    font-size: 14px;
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .radio-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid $border;
+    border-radius: $border-radius-md;
+    font-size: 14px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background: $white;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.2);
+    }
+
+    &:disabled {
+      background: $light;
+      color: $gray;
+      cursor: not-allowed;
+    }
+  }
+
+  textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23{$gray}' stroke-width='2'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+  }
+}
+
+// === Groupe de tags ===
+.tag-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+
+  input.form-control {
+    flex: 1;
+  }
+
+  .btn {
+    white-space: nowrap;
+  }
+}
+
+// === Liste des tags ===
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  background: $accent;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: $font-weight-semibold;
+  gap: 6px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// === Actions du formulaire ===
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 32px;
+
+  .btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: $font-weight-semibold;
+    border-radius: $border-radius-md;
+    transition: all 0.2s ease;
+
+    &.btn-primary {
+      background: $primary;
+      color: white;
+      border: 1px solid $primary;
+
+      &:hover:not(:disabled) {
+        background: darken($primary, 10%);
+        border-color: darken($primary, 10%);
+      }
+
+      &:disabled {
+        background: $border;
+        border-color: $border;
+        color: $gray;
+        cursor: not-allowed;
+      }
+    }
+
+    &.btn-outline {
+      background: transparent;
+      color: $dark;
+      border: 1px solid $border;
+
+      &:hover {
+        border-color: $dark;
+        color: $dark;
+      }
+    }
+  }
+}
+
+// === Responsive ===
+@include respond($breakpoint-md) {
+  .form-container {
+    margin: 16px;
+    padding: 24px;
+  }
+
+  .form-actions {
+    flex-direction: row;
+
+    .btn {
+      min-width: 120px;
+    }
+  }
+
+  .tag-input-group {
+    flex-direction: column;
+
+    .btn {
+      align-self: flex-start;
+    }
+  }
+}
+
+// === Animations ===
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,67 @@
+<app-admin-layout>
+  <!-- En-tête -->
+  <h1 header-title>Questions-Réponses (Flashcards)</h1>
+  <p class="admin-subtitle">
+    Gérez les flashcards utilisées dans les modules, cours et sprints.
+  </p>
+
+  <!-- Recherche + Bouton création -->
+  <div class="admin-header-actions">
+    <app-search-bar
+      placeholder="Rechercher une question, réponse ou tag..."
+      (search)="onSearch($event)"
+    />
+    <a class="btn btn-primary" routerLink="create">
+      + Nouvelle Flashcard
+    </a>
+  </div>
+
+  <!-- Liste des cartes -->
+  <div class="cards-grid" *ngIf="!loading(); else loader">
+    @for (flashcard of getPaginatedFlashcards(); track flashcard.id) {
+      <app-card
+        [title]="flashcard.question"
+        [subtitle]="(flashcard.reponse ? flashcard.reponse.slice(0, 100) + '...' : '')"
+        [footer]="'Niveau : ' + getNiveauLabel(flashcard.niveau)"
+        [clickable]="true"
+        (cardClick)="onCardClick(flashcard)"
+      >
+        <div class="flashcard-meta">
+          <span class="badge {{ getDifficulteClass(flashcard.niveauDifficulte) }}">
+            {{ getDifficulteLabel(flashcard.niveauDifficulte) }}
+          </span>
+          @if (getTags(flashcard).length > 0) {
+            <span class="tags">
+              @for (tag of getTags(flashcard).slice(0,2); track $index) {
+                <span class="tag">{{ tag }}</span>
+              }
+              @if (getTags(flashcard).length > 2) {
+                <span class="tag">+{{ getTags(flashcard).length - 2 }}</span>
+              }
+            </span>
+          }
+        </div>
+      </app-card>
+    }
+
+    @if (filteredFlashcards().length === 0) {
+      <p class="text-muted">Aucune flashcard trouvée.</p>
+    }
+  </div>
+
+  <!-- Pagination -->
+  @if (totalPages() > 1 && !loading()) {
+    <app-pagination
+      [currentPage]="currentPage()"
+      [totalPages]="totalPages()"
+      (pageChange)="onPageChange($event)"
+    />
+  }
+
+  <!-- Loader -->
+  <ng-template #loader>
+    <div class="loader-container">
+      <p>Chargement des flashcards...</p>
+    </div>
+  </ng-template>
+</app-admin-layout>

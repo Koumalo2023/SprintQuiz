@@ -1,0 +1,42 @@
+//src/styles/styles.scss
+
+// 1. Variables & mixins
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+// @use 'abstracts/particles';
+
+// 2. Base
+@use 'base/reset';
+@use 'base/typography';
+@use 'base/animations';
+@use 'base/base';
+
+// 3. Layouts
+@use 'layout/auth-layout';
+@use 'layout/user-layout';
+@use 'layout/admin-layout';
+// @use 'layout/components';
+
+/// Classes racines pour faciliter le targeting
+[data-theme='light'],
+.light {
+  --bg-primary: #f8f9fa;
+  --text-primary: #212529;
+  --card-bg: #ffffff;
+  --border-color: #dee2e6;
+}
+
+[data-theme='dark'],
+.dark {
+  --bg-primary: #121212;
+  --text-primary: #e0e0e0;
+  --card-bg: #1e1e1e;
+  --border-color: #333333;
+}
+
+// Applique les variables
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

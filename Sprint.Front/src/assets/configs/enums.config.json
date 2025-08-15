@@ -1,0 +1,24 @@
+
+{
+  "NiveauEnum": {
+    "0": { "label": "Cours", "color": "#4361ee", "icon": "book", "class": "badge-cours" },
+    "1": { "label": "Module", "color": "#f72585", "icon": "layers", "class": "badge-module" },
+    "2": { "label": "Sprint", "color": "#4cc9f0", "icon": "calendar", "class": "badge-sprint" }
+  },
+  "NiveauDifficulte": {
+    "0": { "label": "Facile", "color": "#22b24c", "icon": "star-half", "class": "badge-success" },
+    "1": { "label": "Moyen", "color": "#f57a00", "icon": "star", "class": "badge-warning" },
+    "2": { "label": "Difficile", "color": "#e83e8c", "icon": "star-full", "class": "badge-danger" }
+  },
+  "RoleUtilisateur": {
+    "0": { "label": "Administrateur", "color": "#6f42c1", "icon": "shield", "class": "badge-admin" },
+    "1": { "label": "Étudiant", "color": "#17a2b8", "icon": "user", "class": "badge-etudiant" }
+  },
+  "TypeExercice": {
+    "0": { "label": "Basique", "color": "#adb5bd", "icon": "circle", "class": "badge-basic" },
+    "1": { "label": "À appliquer", "color": "#007bff", "icon": "arrow-right", "class": "badge-apply" },
+    "2": { "label": "Analyse", "color": "#6f42c1", "icon": "zoom-in", "class": "badge-analyze" },
+    "3": { "label": "Cas pratique", "color": "#fd7e14", "icon": "file-text", "class": "badge-case" },
+    "4": { "label": "Défi", "color": "#d63384", "icon": "flame", "class": "badge-challenge" }
+  }
+}

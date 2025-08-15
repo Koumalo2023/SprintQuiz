@@ -1,0 +1,24 @@
+<!-- src/app/shared/components/tabs/tabs.component.html -->
+<div class="tabs-container">
+  <div class="tabs-header">
+    <button
+      *ngFor="let tab of tabs; index as i"
+      class="tab-button"
+      [class.active]="i === activeTab"
+      [class.disabled]="tab.disabled"
+      (click)="onTabClick(i, tab)"
+      [attr.aria-selected]="i === activeTab"
+      role="tab"
+    >
+      {{ tab.label }}
+    </button>
+    <div
+      class="tab-underline"
+      [style.transform]="'translateX(' + (activeTab * 100) + '%)'"
+      [style.width]="(100 / tabs.length) + '%'"
+    ></div>
+  </div>
+  <div class="tabs-content" role="tabpanel">
+    <ng-content></ng-content>
+  </div>
+</div>

@@ -1,0 +1,162 @@
+<app-admin-layout>
+  <!-- Fil d'Ariane -->
+  @if (breadcrumbItems(); as items) {
+    <app-breadcrumb [items]="items" />
+  }
+
+  <!-- Titre principal -->
+  <h1 header-title>{{ sprint()?.nom || 'Chargement...' }}</h1>
+  <p class="admin-subtitle">{{ sprint()?.description || '' }}</p>
+
+  <!-- Onglets -->
+  <app-tabs
+    [tabs]="[
+      { label: 'Détails' },
+      { label: 'Quiz' },
+      { label: 'Flashcards' },
+      { label: 'Progression' }
+    ]"
+    [activeTab]="activeTab"
+    (tabChange)="onTabChange($event)"
+  />
+
+  <!-- Contenu des onglets -->
+  <div class="tab-content-container">
+    <!-- Onglet 0 : Détails -->
+    @if (activeTab === 0) {
+      <div class="sprint-details">
+        <div class="sprint-header-stats">
+          <app-stats-card
+            [value]="sprint()?.modules?.length || 0"
+            label="Modules"
+            icon="content"
+          />
+          <app-stats-card
+            [value]="(sprint()?.cours || []).length"
+            label="Cours"
+            icon="book"
+          />
+          <app-stats-card
+            [value]="(sprint()?.quizzes || []).length"
+            label="Quiz"
+            icon="quiz"
+          />
+          <app-stats-card
+            [value]="(sprint()?.qaQuestions || []).length"
+            label="Flashcards"
+            icon="flashcard"
+          />
+        </div>
+
+        <div class="sprint-info">
+          <h3>Informations</h3>
+        </div>
+
+        <!-- Liste des modules -->
+        <h3>Modules du sprint</h3>
+        <app-search-bar
+          placeholder="Rechercher un module ou un cours..."
+          (search)="onSearch($event)"
+        />
+        <div class="cards-grid">
+          @if (filteredModules; as modules) {
+            @for (module of modules; track module.id) {
+              <app-card
+                [title]="module.nom"
+                [subtitle]="module.description || ''"
+                [icon]="'icon-module'"
+                [footer]="'Cours : ' + (module.cours?.length || 0)"
+                [clickable]="true"
+                [routerLink]="'/admin/modules/' + module.id"
+              >
+              <!-- Afficher les cours associés -->
+                <!-- @if (module.cours && module.cours.length > 0) {
+                  <ul class="associated-courses">
+                    @for (course of module.cours; track course.id) {
+                      <li>{{ course.titre }}</li>
+                    }
+                  </ul>
+                } @else {
+                  <p>Aucun cours associé.</p>
+                } -->
+              </app-card>
+            }
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Onglet 1 : Quiz -->
+    @if (activeTab === 1) {
+      <div class="sprint-quizzes">
+        <h3>Quiz du sprint</h3>
+        <app-search-bar
+          placeholder="Rechercher un quiz..."
+          (search)="onSearch($event)"
+        />
+        <div class="cards-grid">
+          @if (filteredQuizzes; as quizzes) {
+            @for (quiz of quizzes; track quiz.id) {
+              <app-card
+                [title]="quiz.titre"
+                [icon]="'icon-quiz'"
+                [clickable]="true"
+                [routerLink]="'/admin/quiz/' + quiz.id"
+              />
+            }
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Onglet 2 : Flashcards -->
+    @if (activeTab === 2) {
+      <div class="sprint-flashcards">
+        <h3>Flashcards du sprint</h3>
+        <app-search-bar
+          placeholder="Rechercher une question..."
+          (search)="onSearch($event)"
+        />
+        <div class="cards-grid">
+          @if (filteredFlashcards; as qnas) {
+            @for (qna of qnas; track qna.id) {
+              <app-card
+                [title]="'Q-R #' + qna.id"
+                [subtitle]="qna.question"
+                [icon]="'icon-flashcard'"
+                [clickable]="true"
+                [routerLink]="'/admin/flashcards/' + qna.id"
+              />
+            }
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Onglet 3 : Progression -->
+    @if (activeTab === 3) {
+      <div class="sprint-progress">
+        <h3>Progression globale</h3>
+        <div class="progress-overview">
+          <app-progress-ring
+            [percent]="sprintProgress()"
+            [size]="'large'"
+            [showLabel]="true"
+          />
+          <div class="progress-stats">
+            <app-stats-card
+              [value]="sprintProgress() + '%'"
+              label="Complété"
+              icon="progress"
+            />
+            <app-stats-card
+              [value]="(sprint()?.modules?.length || 0) + ' modules'"
+              label="Total"
+              icon="content"
+            />
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</app-admin-layout>

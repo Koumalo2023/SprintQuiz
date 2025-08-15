@@ -1,0 +1,199 @@
+// src/app/auth/register/register.component.scss
+
+// Utilise les styles globaux
+@use 'layout/auth-layout';
+@use '../../../styles/abstracts/variables' as *;
+@use '../../../styles/abstracts/mixins' as *;
+@use '../../../styles/components/forms';
+
+
+// Styles spécifiques au formulaire d'inscription
+.register-container {
+  padding: 32px;
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .logo {
+    font-size: 32px;
+    font-weight: 700;
+    background: $gradient-accent;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    animation: logoGlow 2s ease-in-out infinite alternate;
+  }
+
+  .register-title {
+    font-size: 24px;
+    font-weight: $font-weight-semibold;
+    color: $dark;
+    margin-bottom: 8px;
+  }
+
+  .register-subtitle {
+    font-size: 14px;
+    color: $gray;
+  }
+}
+
+.register-title {
+  font-size: 24px;
+  font-weight: $font-weight-semibold;
+  color: $dark;
+  margin-bottom: 8px;
+}
+
+.register-subtitle {
+  font-size: 14px;
+  color: $gray;
+  margin-bottom: 24px;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row{
+    display: flex;
+    flex-direction: row;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group-inline {
+  width: calc(50% - 10px); // Pour partager l'espace avec le champ "Nom"
+  margin-right: 10px;
+
+  &:nth-child(2n) {
+    margin-right: 0;
+  }
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: $font-weight-semibold;
+  color: $dark;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px 40px 16px 16px; // Laisse de la place pour l'icône
+  border: $border-width solid $border;
+  border-radius: $border-radius;
+  font-size: 16px;
+  font-family: $font-family;
+  background: #FFFFFF;
+  color: $dark;
+  transition: all 0.3s ease;
+
+  &::placeholder {
+    color: $gray;
+  }
+
+  &:focus {
+    @include input-focus;
+    + .input-icon {
+      fill: $accent;
+    }
+  }
+}
+
+.input-with-icon {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.input-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  fill: $gray;
+  pointer-events: none;
+  transition: fill 0.3s ease;
+  z-index: 1;
+}
+
+.register-button {
+  @include button-gradient($gradient-accent);
+  margin-top: 16px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: $font-weight-semibold;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  overflow: hidden;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.login-links {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+
+  a {
+    color: $primary;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: $accent;
+      text-decoration: underline;
+    }
+  }
+
+  .register-link {
+    color: $accent;
+    font-weight: $font-weight-semibold;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .form-group-inline {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .form-input {
+    padding: 14px 16px;
+    font-size: 16px;
+  }
+
+  .form-row{
+    flex-direction: column;
+  }
+
+  .register-button {
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+}

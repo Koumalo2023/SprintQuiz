@@ -1,0 +1,141 @@
+// src/app/admin/exercices/exercices-form.component.scss
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+  color: $dark;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.bulk-toggle {
+  background: $lighter;
+  padding: 1rem;
+  border-radius: $border-radius-lg;
+  border: 1px solid $border;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: $gray-dark;
+}
+
+.form-container {
+  margin-top: 1.5rem;
+  background: $white;
+  padding: 2rem;
+  border-radius: $border-radius-lg;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: $dark;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid $border;
+    border-radius: $border-radius;
+    font-size: 1rem;
+    transition: border 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    }
+  }
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+.input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  .input-group-text {
+    background: $light;
+    border: 1px solid $border;
+    padding: 0.5rem 0.75rem;
+    border-radius: $border-radius;
+    font-weight: 500;
+    min-width: 40px;
+    text-align: center;
+  }
+
+  .btn-danger {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+.btn {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: $border-radius;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &.btn-primary {
+    background: $primary;
+    color: $white;
+
+    &:hover {
+      background: darken($primary, 10%);
+    }
+  }
+
+  &.btn-secondary {
+    background: $gray;
+    color: $white;
+
+    &:hover {
+      background: darken($gray, 10%);
+    }
+  }
+
+  &.btn-outline {
+    background: transparent;
+    border: 1px solid $border;
+    color: $dark;
+
+    &:hover {
+      background: $light;
+      border-color: $dark;
+    }
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}

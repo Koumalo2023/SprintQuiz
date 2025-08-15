@@ -1,0 +1,54 @@
+<app-admin-layout>
+  <!-- Titre principal -->
+  <h1 header-title>Liste des Sprints</h1>
+  <p class="admin-subtitle">Gérez les sprints pédagogiques de la plateforme</p>
+
+  <!-- Stats rapides -->
+  <div class="admin-stats-grid">
+    <div class="admin-stat-card">
+      <app-stats-card
+        [value]="sprints().length"
+        label="Sprints totaux"
+        icon="sprint"
+        [trend]="'up'"
+        [trendValue]="'+2'"
+      />
+    </div>
+  </div>
+
+  <!-- Recherche + Action -->
+  <div class="admin-header-actions">
+    <app-search-bar
+      placeholder="Rechercher un sprint..."
+      [showFilters]="false"
+      (search)="onSearch($event)"
+    />
+    <a class="btn btn-primary" routerLink="create">+ Nouveau Sprint</a>
+  </div>
+
+  <!-- Grille des cartes -->
+  <div class="cards-grid">
+  @for (sprint of getPaginatedSprints(); track sprint.id) {
+    <app-card
+  [title]="sprint.nom"
+  [subtitle]="sprint.description || ''"
+  [icon]="'icon-sprint'"
+  [footer]="'Modules : ' + (sprint.modules?.length || 0)"
+  [progress]="getProgressForUser(sprint)"
+  [clickable]="true"
+  (cardClick)="onCardClick(sprint)"
+>
+  
+</app-card>
+  }
+</div>
+
+  <!-- Pagination -->
+  @if (totalPages() > 1) {
+    <app-pagination
+      [currentPage]="currentPage()"
+      [totalPages]="totalPages()"
+      (pageChange)="onPageChange($event)"
+    />
+  }
+</app-admin-layout>

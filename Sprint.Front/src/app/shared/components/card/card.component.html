@@ -1,0 +1,61 @@
+<!-- src/app/shared/components/card/card.component.html -->
+
+<article
+  class="card"
+  [class.card--clickable]="clickable"
+  [class.card--disabled]="disabled"
+  (click)="handleClick($event)"
+>
+  <!-- 🔹 Badges dynamiques en haut à droite -->
+  <div class="card-badges" *ngIf="niveauMeta || typeMeta || difficulteMeta">
+    <span
+      class="badge"
+      [ngClass]="niveauMeta?.class"
+      *ngIf="niveauMeta"
+      [style.background]="niveauMeta.color"
+    >
+      <i class="icon {{ niveauMeta.icon }}"></i>
+      {{ niveauMeta.label }}
+    </span>
+    <span
+      class="badge"
+      [ngClass]="typeMeta?.class"
+      *ngIf="typeMeta"
+      [style.background]="typeMeta.color"
+    >
+      <i class="icon {{ typeMeta.icon }}"></i>
+      {{ typeMeta.label }}
+    </span>
+    <span
+      class="badge"
+      [ngClass]="difficulteMeta?.class"
+      *ngIf="difficulteMeta"
+      [style.background]="difficulteMeta.color"
+    >
+      <i class="icon {{ difficulteMeta.icon }}"></i>
+      {{ difficulteMeta.label }}
+    </span>
+  </div>
+
+  <div class="card-header" *ngIf="title || icon">
+    <span class="card-icon" *ngIf="icon" [class]="icon"></span>
+    <div class="card-title-group">
+      <h3 class="card-title">{{ title }}</h3>
+      <p class="card-subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <ng-content></ng-content>
+  </div>
+
+  <div class="card-footer" *ngIf="footer || progress !== null">
+    <span class="card-footer-text" *ngIf="footer">{{ footer }}</span>
+    <div class="card-progress" *ngIf="progress !== null">
+      <div class="card-progress-bar">
+        <div class="card-progress-fill" [style.width.%]="progress"></div>
+      </div>
+      <small class="card-progress-label">{{ progress }}%</small>
+    </div>
+  </div>
+</article>

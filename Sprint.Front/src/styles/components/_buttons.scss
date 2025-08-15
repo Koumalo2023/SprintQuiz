@@ -1,0 +1,84 @@
+//styles/components/_buttons.scss
+
+@use 'sass:color';
+// Base button
+.app-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: $border-radius;
+  font-family: $font-family;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+
+  &.primary {
+    @include button-gradient($gradient-accent);
+  }
+
+  &.secondary {
+    background: $light;
+    color: $dark;
+    border: 1px solid $border;
+
+    &:hover {
+      background: color.adjust($light, 5%);
+      border-color: $primary;
+    }
+  }
+
+  &.success {
+    @include button-gradient($gradient-success);
+  }
+
+  &.danger {
+    @include button-gradient($gradient-danger);
+  }
+
+  &.icon {
+    padding: 12px;
+    min-width: 48px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  // Full width
+  &.block {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+// Small button
+.app-button-sm {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  border-radius: $border-radius-sm;
+}
+
+// Large button
+.app-button-lg {
+  padding: 16px 32px;
+  font-size: 1.125rem;
+}
+
+// === Bouton Outline (fond transparent, bordure colorée) ===
+.btn-outline {
+  @extend %btn-outline;
+}
+
+// === Version avec couleur personnalisée (optionnel) ===
+.btn-outline-danger {
+  @include btn-outline($danger);
+}
+
+.btn-outline-success {
+  @include btn-outline($success);
+}

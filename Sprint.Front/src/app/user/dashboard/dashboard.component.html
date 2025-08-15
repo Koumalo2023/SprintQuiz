@@ -1,0 +1,74 @@
+<!-- src/app/user/dashboard/student-dashboard.component.html -->
+<app-user-navigation-layout [fullWidth]="true">
+  <!-- En-tête du dashboard -->
+  <div header-title>
+    <h1>Bonjour, {{ user.name }} 👋</h1>
+    <p class="user-subtitle">Voici votre tableau de bord d’apprentissage</p>
+  </div>
+
+  <!-- Barre de recherche -->
+  <app-search-bar
+    [placeholder]="'Rechercher un sprint, module ou cours...'"
+    [showFilters]="true"
+    (search)="onSearch($event)"
+    (filterToggle)="onFilterToggle()"
+    class="dashboard-search"
+  ></app-search-bar>
+
+  <!-- Statistiques globales -->
+  <section class="stats-grid">
+    <app-stats-card
+      *ngFor="let stat of stats"
+      [value]="stat.value"
+      [label]="stat.label"
+      [icon]="stat.icon"
+      [trend]="stat.trend"
+      [trendValue]="stat.trendValue"
+    ></app-stats-card>
+  </section>
+
+  <!-- Sprints en cours -->
+  <section class="current-sprints">
+    <h2 class="section-title">Sprints en cours</h2>
+    <div class="sprints-grid">
+      <app-card
+        *ngFor="let sprint of sprints"
+        [title]="sprint.title"
+        [subtitle]="getSubtitle(sprint)"
+        [icon]="'icon-sprint'"
+        [progress]="sprint.progress"
+        [footer]="'Dernier accès : ' + sprint.lastAccess"
+        [clickable]="true"
+      >
+        <app-progress-ring [percent]="sprint.progress" size="small" class="card-ring"></app-progress-ring>
+      </app-card>
+    </div>
+  </section>
+
+  <!-- Prochaines actions -->
+  <section class="next-actions">
+    <h2 class="section-title">À faire ensuite</h2>
+    <div class="actions-list">
+      <app-card
+        *ngFor="let action of nextActions"
+        [title]="action.title"
+        [subtitle]="action.subtitle"
+        [icon]="'icon-' + action.type"
+        [footer]="action.due"
+        [clickable]="true"
+      >
+        <div class="action-badge" [class]="'action-badge--' + action.type">
+          {{ action.type }}
+        </div>
+      </app-card>
+    </div>
+  </section>
+
+  <!-- Avatar utilisateur (optionnel en haut à droite) -->
+  <app-user-avatar
+    [name]="user.name"
+    [imageUrl]="user.avatar"
+    size="lg"
+    class="user-avatar-fixed"
+  ></app-user-avatar>
+</app-user-navigation-layout>

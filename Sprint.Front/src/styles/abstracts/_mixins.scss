@@ -1,0 +1,224 @@
+//styles/abstracts/_mixins.scss
+@use 'variables' as *;
+// Flex center
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+// Responsive
+@mixin respond($breakpoint) {
+  @media (max-width: $breakpoint) {
+    @content;
+  }
+}
+
+
+@mixin input-focus {
+  outline: none;
+  border-color: blue;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+
+// Button style
+@mixin button-style($bg-gradient, $hover-transform: translateY(-2px)) {
+  background: $bg-gradient;
+  color: #FFFFFF;
+  border: none;
+  padding: 12px 24px;
+  border-radius: $border-radius;
+  font-family: $font-family;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+
+  &:hover {
+    transform: $hover-transform;
+    box-shadow: $box-shadow-hover;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+// styles/abstracts/_mixins.scss
+
+// === Bouton outline (style transparent avec bordure) ===
+// Placeholder pour @extend
+%btn-outline {
+  background: transparent;
+  color: $primary;
+  border: 2px solid $primary;
+  padding: 12px 24px;
+  border-radius: $border-radius;
+  font-family: $font-family;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: $primary;
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: $box-shadow-hover;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    border-color: $gray;
+    color: $gray;
+  }
+}
+
+// === Version spécifique pour les autres couleurs (optionnel) ===
+// Mixin paramétrable pour d'autres couleurs
+@mixin btn-outline($color: $primary) {
+  background: transparent;
+  color: $color;
+  border: 2px solid $color;
+  padding: 12px 24px;
+  border-radius: $border-radius;
+  font-family: $font-family;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: $color;
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: $box-shadow-hover;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    border-color: $gray;
+    color: $gray;
+  }
+}
+
+@mixin button-gradient($gradient) {
+  @include button-style($gradient);
+}
+
+
+// Card style
+@mixin user-card {
+  background: #FFFFFF;
+  border: $border-width solid $border;
+  border-radius: $border-radius-lg;
+  padding: 24px;
+  box-shadow: $box-shadow;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $box-shadow-hover;
+  }
+}
+
+// Progress bar
+@mixin progress-bar($bg-color: $primary) {
+  .progress-fill {
+    height: 8px;
+    background: $bg-color;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+}
+
+/// Applique un effet de flou d'arrière-plan (backdrop-filter)
+/// @param {Length} $value - Rayon de flou (ex: 10px)
+/// @requires prefix -webkit-backdrop-filter pour Safari
+@mixin backdrop-blur($value: 10px) {
+  -webkit-backdrop-filter: blur($value);
+          backdrop-filter: blur($value);
+}
+
+
+//Mixin utile pour le loader
+@mixin loading-spinner($size, $color) {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: $size;
+  height: $size;
+  margin: calc(-1 * ($size / 2)) 0 0 calc(-1 * ($size / 2));
+  border: 2px solid transparent;
+  border-top-color: $color;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@mixin keyframes($name) {
+  @keyframes #{$name} {
+    @content;
+  }
+}
+
+
+@mixin slide-up($delay: 0s) {
+  animation: slideUp 0.6s ease-out $delay both;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/// Mixin pour centrer verticalement les éléments avec Flexbox
+/// @param {string} $direction - Direction du conteneur (row | column) - par défaut row
+/// @param {string} $align - Alignement des éléments (center, flex-start, flex-end) - par défaut center
+/// @param {string} $justify - Justification (utile si $direction: row) - par défaut center
+/// @param {number} $gap - Espacement entre les éléments enfants - par défaut null
+@mixin flex-center-vertical(
+  $direction: row,
+  $align: center,
+  $justify: center,
+  $gap: null
+) {
+  display: flex;
+  flex-direction: $direction;
+  align-items: $align;
+
+  // Appliquer justify-content uniquement si nécessaire
+  @if $justify != null {
+    justify-content: $justify;
+  }
+
+  // Appliquer gap si spécifié
+  @if $gap != null {
+    gap: $gap;
+  }
+}
+
+// Gestion des Badges
+@mixin badge-style($bg-color, $text-color: $white) {
+  background: $bg-color;
+  color: $text-color;
+  border: none;
+  padding: 6px 12px;
+  border-radius: $border-radius;
+  font-size: 12px;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

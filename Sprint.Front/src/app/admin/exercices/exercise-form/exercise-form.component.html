@@ -1,0 +1,166 @@
+<app-admin-layout>
+    <div class="container">
+        <h1>{{ isEditMode() ? 'Modifier' : 'Créer' }} un Exercice</h1>
+
+        <!-- Mode Import -->
+        <div class="bulk-toggle mb-4">
+            <label>
+                <input type="checkbox" [(ngModel)]="isBulkMode" (change)="clearFile()" />
+                Création groupée via JSON
+            </label>
+        </div>
+
+        <!-- Upload JSON -->
+        @if (isBulkMode) {
+        <div class="form-group mb-6">
+            <label>Importer depuis un fichier JSON</label>
+            <input type="file" accept=".json" (change)="onFileSelected($event)" class="form-control" />
+            <small class="text-muted">
+                Format attendu : tableau d'objets
+                <code>{{ '{' }}  "enonce", "solution", "indices", "etapes" {{ '}' }}</code>
+            </small>
+        </div>
+        }
+
+        <div class="form-container" *ngIf="!loading(); else loader">
+            <form (ngSubmit)="onSubmit()" #exerciseForm="ngForm">
+
+                <!-- Niveau de rattachement -->
+                <div class="form-group mb-4">
+                    <label>Niveau de rattachement *</label>
+                    <div class="radio-group">
+                        @for (niveau of [NiveauEnum.Sprint, NiveauEnum.Module, NiveauEnum.Cours]; track $index) {
+                        <label class="radio-label">
+                            <input type="radio" name="niveau" [value]="niveau" [(ngModel)]="exercice().niveau"
+                                (change)="onNiveauChange()" />
+                            {{ enumService.getNiveauLabel(niveau) }}
+                        </label>
+                        }
+                    </div>
+                </div>
+
+                <!-- Sélection du Sprint -->
+                <div class="form-group mb-4">
+                    <label>Sprint *</label>
+                    <select class="form-control" [(ngModel)]="selectedSprintId" (ngModelChange)="loadModules($event)"
+                        name="sprintId" required>
+                        <option value="" disabled>Sélectionner un sprint</option>
+                        @for (sprint of sprints(); track sprint.id) {
+                        <option [value]="sprint.id">{{ sprint.nom }}</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Sélection du Module -->
+                @if (exercice().niveau === NiveauEnum.Module || exercice().niveau === NiveauEnum.Cours) {
+                <div class="form-group mb-4">
+                    <label>Module *</label>
+                    <select class="form-control" [(ngModel)]="selectedModuleId" (ngModelChange)="loadCours($event)"
+                        [disabled]="modules().length === 0" name="moduleId" required>
+                        <option value="" disabled>@if (modules().length > 0) { Sélectionner un module } @else { Aucun
+                            module disponible } </option>
+                        @for (module of modules(); track module.id) {
+                        <option [value]="module.id">{{ module.nom }}</option>
+                        }
+                    </select>
+                </div>
+                }
+                
+
+                <!-- Énoncé -->
+                <div class="form-group mb-4">
+                    <label>Énoncé *</label>
+                    <textarea class="form-control" rows="4" [(ngModel)]="exercice().enonce" name="enonce"
+                        required></textarea>
+                </div>
+
+                <!-- Solution -->
+                <div class="form-group mb-4">
+                    <label>Solution *</label>
+                    <textarea class="form-control" rows="6" [(ngModel)]="exercice().solution" name="solution"
+                        required></textarea>
+                </div>
+
+                <!-- Résumé de la solution -->
+                <div class="form-group mb-4">
+                    <label>Résumé de la solution (optionnel)</label>
+                    <textarea class="form-control" rows="3" [(ngModel)]="exercice().solutionResume"
+                        name="solutionResume"></textarea>
+                </div>
+
+                <!-- Difficulté -->
+                <div class="form-group mb-4">
+                    <label>Difficulté</label>
+                    <select class="form-control" [(ngModel)]="exercice().niveauDifficulte" name="niveauDifficulte">
+                        @for (diff of [NiveauDifficulte.Facile, NiveauDifficulte.Moyen, NiveauDifficulte.Difficile];
+                        track $index) {
+                        <option [value]="diff">{{ enumService.getDifficulteMetadata(diff).label }}</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Type d'exercice -->
+                <div class="form-group mb-4">
+                    <label>Type d'exercice</label>
+                    <select class="form-control" [(ngModel)]="exercice().type" name="type">
+                        @for (type of [TypeExercice.Basique, TypeExercice.Applique, TypeExercice.Analyse,
+                        TypeExercice.Cas, TypeExercice.Defi]; track $index) {
+                        <option [value]="type">{{ enumService.getTypeExerciceMetadata(type).label }}</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Tags -->
+                <div class="form-group mb-4">
+                    <label>Tags (séparés par des virgules)</label>
+                    <input type="text" class="form-control" [(ngModel)]="exercice().tags" name="tags"
+                        (change)="updateTags($event)" />
+                </div>
+
+                <!-- Indices -->
+                <div class="form-group mb-6">
+                    <label>Indices</label>
+                    <button type="button" (click)="addIndice()" class="btn btn-sm btn-outline">+ Ajouter un
+                        indice</button>
+                    @for (indice of indices(); track $index) {
+                    <div class="input-group mt-2">
+                        <span class="input-group-text">{{ $index + 1 }}</span>
+                        <input type="text" class="form-control" [(ngModel)]="indices()[ $index ].texte"
+                            placeholder="Indice" />
+                        <button type="button" (click)="removeIndice($index)" class="btn btn-danger btn-sm">×</button>
+                    </div>
+                    }
+                </div>
+
+                <!-- Étapes de résolution -->
+                <div class="form-group mb-6">
+                    <label>Étapes de résolution</label>
+                    <button type="button" (click)="addEtape()" class="btn btn-sm btn-outline">+ Ajouter une
+                        étape</button>
+                    @for (etape of etapes(); track $index) {
+                    <div class="input-group mt-2">
+                        <span class="input-group-text">{{ etape.ordre + 1 }}</span>
+                        <textarea class="form-control" rows="2" [(ngModel)]="etapes()[ $index ].description"
+                            placeholder="Description de l’étape">
+    </textarea>
+                        <button type="button" (click)="removeEtape($index)" class="btn btn-danger btn-sm">×</button>
+                    </div>
+                    }
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary"
+                        (click)="router.navigate(['/admin/exercises'])">Annuler</button>
+                    <button type="submit" class="btn btn-primary">
+                        {{ isEditMode() ? 'Mettre à jour' : 'Créer' }} l’exercice
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <ng-template #loader>
+            <app-loader />
+        </ng-template>
+    </div>
+</app-admin-layout>

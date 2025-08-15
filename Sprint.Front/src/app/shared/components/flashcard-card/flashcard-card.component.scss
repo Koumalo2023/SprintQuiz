@@ -1,0 +1,186 @@
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+// Générateur d'ID unique pour les labels aria (optionnel, peut être géré en TS)
+$unique-id: unique-id() !default;
+
+.flashcard-card {
+  position: relative;
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $border-radius-lg;
+  padding: 20px;
+  box-shadow: $box-shadow-sm;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none;
+
+  &:hover:not(.disabled) {
+    box-shadow: $box-shadow;
+    transform: translateY(-4px);
+    .flashcard-card__icon {
+      background: $accent;
+      svg {
+        stroke: $white;
+      }
+    }
+  }
+
+  &.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: not-allowed;
+    .flashcard-card__icon {
+      background: $gray-light;
+      svg {
+        stroke: $gray;
+      }
+    }
+  }
+}
+
+// === BADGES DYNAMIQUES (niveau, type) ===
+.flashcard-card__badges {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+  z-index: 1;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+// Réutilisation du style des badges
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: $font-weight-semibold;
+  padding: 0.25rem 0.5rem;
+  border-radius: $border-radius;
+  color: $white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+// === HEADER ===
+.flashcard-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.flashcard-card__icon {
+  width: 40px;
+  height: 40px;
+  background: $gradient-accent;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.3s ease;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    stroke: $primary;
+    transition: stroke 0.3s ease;
+  }
+}
+
+.flashcard-card__title {
+  font-size: 1rem;
+  font-weight: $font-weight-semibold;
+  color: $dark;
+  margin: 0;
+}
+
+// === STATISTIQUES ===
+.flashcard-card__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat__value {
+  display: block;
+  font-weight: $font-weight-bold;
+  font-size: 1.1rem;
+
+  &--mastered {
+    color: $success;
+  }
+
+  &--in-progress {
+    color: $primary;
+  }
+}
+
+.stat__label {
+  color: $gray;
+  font-size: 0.75rem;
+}
+
+// === PROGRESSION ===
+.flashcard-card__progress {
+  margin-bottom: 12px;
+}
+
+.progress-bar {
+  height: 6px;
+  background: $light;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  background: $accent;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+  width: 0;
+}
+
+.progress-label {
+  font-size: 0.75rem;
+  color: $gray;
+  display: block;
+  text-align: right;
+  margin-top: 4px;
+}
+
+// === STATUT (badge d'état) ===
+.flashcard-card__status-badge {
+  position: absolute;
+  top: 16px;
+  right: -28px;
+  background: $accent;
+  color: $white;
+  font-size: 0.7rem;
+  font-weight: $font-weight-bold;
+  padding: 4px 32px;
+  transform: rotate(45deg);
+  white-space: nowrap;
+  z-index: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.status--completed {
+    background: $success;
+  }
+
+  &.status--locked {
+    background: $gray;
+  }
+}

@@ -1,0 +1,117 @@
+// src/app/admin/quiz/quiz-detail.component.scss
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+.admin-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.btn-group {
+  display: flex;
+  gap: 8px;
+}
+
+// Grille des stats
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+
+  .admin-stat-card.context {
+    // .admin-stat-icon {
+    //   &.sprint { background: $gradient-sprint; }
+    //   &.module { background: $gradient-module; }
+    //   &.cours  { background: $gradient-cours; }
+    // }
+  }
+}
+
+// Section questions
+.questions-section {
+  margin-top: 32px;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  color: $dark;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.options-list {
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid $border;
+  border-radius: $border-radius-md;
+  font-size: 14px;
+
+  &.correct {
+    border-color: $success;
+    background-color: rgba($success, 0.1);
+  }
+}
+
+.option-letter {
+  width: 28px;
+  height: 28px;
+  background: $primary;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.option-text {
+  flex: 1;
+  color: $dark;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+
+  &.correct {
+    background: $success;
+    color: white;
+  }
+}
+
+.explication {
+  margin-top: 12px;
+  padding: 12px;
+  background: $light;
+  border-left: 4px solid $info;
+  font-style: italic;
+  color: $gray-dark;
+  font-size: 14px;
+}
+
+// Responsive
+@include respond($breakpoint-md) {
+  .admin-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .btn-group {
+    flex-direction: column;
+  }
+}

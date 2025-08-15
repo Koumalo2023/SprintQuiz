@@ -1,0 +1,61 @@
+//src/app/shared/layouts/admin-layout.component.scss
+
+@use '../../../../styles/abstracts/mixins' as *;
+@use '../../../../styles/abstracts/variables' as *;
+
+// === Comportement par défaut (desktop) ===
+.admin-sidebar {
+  // En desktop, la sidebar est VISIBLE par défaut (pas de transform)
+  transform: none;
+  // Elle est fixe, donc elle ne disparaît pas
+}
+
+// === Mode mobile : cacher la sidebar par défaut ===
+@include respond($breakpoint-md) {
+  .admin-sidebar {
+    // En mobile, on la cache par défaut
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  // Quand l'utilisateur ouvre le menu
+  .admin-sidebar.mobile-visible {
+    transform: translateX(0);
+  }
+}
+
+// === Overlay mobile ===
+.admin-mobile-overlay {
+  display: none;
+
+  @include respond($breakpoint-md) {
+    &.ng-star-inserted, // Angular ajoute ce sélecteur avec *ngIf
+    [class*="mobile-visible"] ~ & {
+      display: block;
+    }
+  }
+}
+
+// === Bouton mobile ===
+.admin-mobile-menu-toggle {
+  display: none;
+
+  @include respond($breakpoint-md) {
+    display: block;
+  }
+}
+
+// === Contenu principal ===
+.admin-main-content {
+  // Par défaut (desktop), la sidebar est visible → margin-left
+  margin-left: 280px;
+  transition: margin-left 0.3s ease;
+
+  // En mobile, si la sidebar est cachée, on prend tout l'espace
+  @include respond($breakpoint-md) {
+    margin-left: 0;
+
+    // Optionnel : quand la sidebar est ouverte, décaler le contenu
+    // Mais souvent on préfère que le contenu soit fixe
+  }
+}

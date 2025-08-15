@@ -1,0 +1,137 @@
+<p>cours-detail works!</p>
+<app-admin-layout>
+  <!-- Fil d'Ariane -->
+  @if (breadcrumbItems(); as items) {
+    <app-breadcrumb [items]="items" />
+  }
+
+  <!-- Titre principal -->
+  <h1 header-title>{{ cours()?.titre || 'Chargement...' }}</h1>
+  <p class="admin-subtitle">{{ cours()?.description || '' }}</p>
+
+  <!-- Onglets -->
+  <app-tabs
+    [tabs]="[
+      { label: 'Détails' },
+      { label: 'Quiz' },
+      { label: 'Flashcards' },
+      { label: 'Progression' }
+    ]"
+    [activeTab]="activeTab"
+    (tabChange)="onTabChange($event)"
+  />
+
+  <!-- Contenu des onglets -->
+  <div class="tab-content-container">
+    <!-- Onglet 0 : Détails -->
+    @if (activeTab === 0) {
+      <div class="cours-details">
+        <div class="cours-header-stats">
+          <app-stats-card
+            [value]="(cours()?.quizzes || []).length"
+            label="Quiz"
+            icon="quiz"
+          />
+          <app-stats-card
+            [value]="(cours()?.qaQuestions || []).length"
+            label="Flashcards"
+            icon="flashcard"
+          />
+          <app-stats-card
+            [value]="coursProgress() + '%'"
+            label="Progression"
+            icon="progress"
+          />
+          <app-stats-card
+
+            label="Durée estimée"
+            icon="time"
+          />
+        </div>
+
+        <div class="cours-info">
+          <h3>Informations du cours</h3>
+          <p><strong>Titre :</strong> {{ cours()?.titre }}</p>
+          <p><strong>Description :</strong> {{ cours()?.description || 'Aucune' }}</p> 
+        </div>
+      </div>
+    }
+
+    <!-- Onglet 1 : Quiz -->
+    @if (activeTab === 1) {
+      <div class="cours-quizzes">
+        <h3>Quiz du cours</h3>
+        <app-search-bar
+          placeholder="Rechercher un quiz..."
+          (search)="onSearch($event)"
+        />
+        <div class="cards-grid">
+          @if (filteredQuizzes; as quizzes) {
+            @for (quiz of quizzes; track quiz.id) {
+              <app-card
+                [title]="quiz.titre"
+                [icon]="'icon-quiz'"
+                [clickable]="true"
+                [routerLink]="'/admin/quiz/' + quiz.id"
+              />
+            }
+          } @else {
+            <p>Aucun quiz disponible.</p>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Onglet 2 : Flashcards -->
+    @if (activeTab === 2) {
+      <div class="cours-flashcards">
+        <h3>Flashcards du cours</h3>
+        <app-search-bar
+          placeholder="Rechercher une question..."
+          (search)="onSearch($event)"
+        />
+        <div class="cards-grid">
+          @if (filteredFlashcards; as qnas) {
+            @for (qna of qnas; track qna.id) {
+              <app-card
+                [title]="'Q-R #' + qna.id"
+                [subtitle]="qna.question"
+                [icon]="'icon-flashcard'"
+                [clickable]="true"
+                [routerLink]="'/admin/flashcards/' + qna.id"
+              />
+            }
+          } @else {
+            <p>Aucune flashcard disponible.</p>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Onglet 3 : Progression -->
+    @if (activeTab === 3) {
+      <div class="cours-progress">
+        <h3>Progression du cours</h3>
+        <div class="progress-overview">
+          <app-progress-ring
+            [percent]="coursProgress()"
+            [size]="'large'"
+            [showLabel]="true"
+          />
+          <div class="progress-stats">
+            <app-stats-card
+              [value]="coursProgress() + '%'"
+              label="Complété"
+              icon="progress"
+            />
+            <app-stats-card
+              [value]="(cours()?.quizzes?.length || 0) + ' quiz'"
+              label="Total"
+              icon="quiz"
+            />
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</app-admin-layout>

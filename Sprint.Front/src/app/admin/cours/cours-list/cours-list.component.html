@@ -1,0 +1,54 @@
+<app-admin-layout>
+  <!-- Titre principal -->
+  <h1 header-title>Liste des Cours</h1>
+  <p class="admin-subtitle">Gérez les cours pédagogiques de la plateforme</p>
+
+  <!-- Stats rapides -->
+  <div class="admin-stats-grid">
+    <div class="admin-stat-card">
+      <app-stats-card
+        [value]="cours().length"
+        label="Cours totaux"
+        icon="cours"
+        [trend]="'up'"
+        [trendValue]="'+5'"
+      />
+    </div>
+  </div>
+
+  <!-- Recherche + Action -->
+  <div class="admin-header-actions">
+    <app-search-bar
+      placeholder="Rechercher un cours..."
+      [showFilters]="false"
+      (search)="onSearch($event)"
+    />
+    <a class="btn btn-primary" routerLink="create">+ Nouveau Cours</a>
+  </div>
+
+  <!-- Grille des cartes -->
+  <div class="cards-grid">
+    @for (c of getPaginatedCours(); track c.id) {
+      <app-card
+        [title]="c.titre"
+        [subtitle]="c.description || ''"
+        [icon]="'icon-cours'"
+        [footer]="getModuleName(c.moduleId)"
+        [progress]="getProgressForUser(c)"
+        [clickable]="true"
+        (cardClick)="onCardClick(c)"
+      >
+        <small>Type : {{ c.ordre }}</small>
+      </app-card>
+    }
+  </div>
+
+  <!-- Pagination -->
+  @if (totalPages() > 1) {
+    <app-pagination
+      [currentPage]="currentPage()"
+      [totalPages]="totalPages()"
+      (pageChange)="onPageChange($event)"
+    />
+  }
+</app-admin-layout>

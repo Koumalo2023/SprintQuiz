@@ -1,0 +1,54 @@
+<app-admin-layout>
+  <!-- Titre principal -->
+  <h1 header-title>Liste des Modules</h1>
+  <p class="admin-subtitle">Gérez les modules pédagogiques de la plateforme</p>
+
+  <!-- Stats rapides -->
+  <div class="admin-stats-grid">
+    <div class="admin-stat-card">
+      <app-stats-card
+        [value]="modules().length"
+        label="Modules totaux"
+        icon="module"
+        [trend]="'up'"
+        [trendValue]="'+3'"
+      />
+    </div>
+  </div>
+
+  <!-- Recherche + Action -->
+  <div class="admin-header-actions">
+    <app-search-bar
+      placeholder="Rechercher un module..."
+      [showFilters]="false"
+      (search)="onSearch($event)"
+    />
+    <a class="btn btn-primary" routerLink="create">+ Nouveau Module</a>
+  </div>
+
+  <!-- Grille des cartes -->
+  <div class="cards-grid">
+    @for (module of getPaginatedModules(); track module.id) {
+      <app-card
+        [title]="module.nom"
+        [subtitle]="module.description || ''"
+        [icon]="'icon-module'"
+        [footer]="'Cours : ' + (module.cours?.length || 0)"
+        [progress]="getProgressForUser(module)"
+        [clickable]="true"
+        (cardClick)="onCardClick(module)"
+      >
+        <small>Sprint : {{ module.sprintId ? 'Lié' : 'Aucun' }}</small>
+      </app-card>
+    }
+  </div>
+
+  <!-- Pagination -->
+  @if (totalPages() > 1) {
+    <app-pagination
+      [currentPage]="currentPage()"
+      [totalPages]="totalPages()"
+      (pageChange)="onPageChange($event)"
+    />
+  }
+</app-admin-layout>

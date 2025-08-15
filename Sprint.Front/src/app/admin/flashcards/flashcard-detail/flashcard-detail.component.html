@@ -1,0 +1,75 @@
+<app-admin-layout>
+  <!-- En-tête -->
+  <h1 header-title>{{ flashcard()?.question || 'Flashcard' }}</h1>
+  <p class="admin-subtitle">Détail de la question-réponse</p>
+
+  <!-- Contenu -->
+  <div class="flashcard-detail-container" *ngIf="!loading(); else loader">
+    <!-- Boutons d'action -->
+    <div class="detail-actions">
+      <button class="btn btn-outline" (click)="goBack()">
+        ← Retour
+      </button>
+      <button class="btn btn-secondary" (click)="onEdit()">
+        ✏️ Modifier
+      </button>
+      <button class="btn btn-danger" (click)="onDelete()">
+        🗑️ Supprimer
+      </button>
+    </div>
+
+    <!-- Informations principales -->
+    <app-card>
+      <h3 class="detail-title">Question</h3>
+      <p class="detail-content">{{ flashcard()?.question }}</p>
+
+      <h3 class="detail-title">Réponse</h3>
+      <p class="detail-content">{{ flashcard()?.reponse }}</p>
+    </app-card>
+
+    <!-- Métadonnées -->
+    <div class="metadata-grid">
+      <!-- Niveau -->
+      <app-card>
+        <h3 class="detail-title">Niveau de rattachement</h3>
+        <p><strong>Type :</strong> {{ getNiveauLabel(flashcard()!.niveau) }}</p>
+        <p><strong>ID :</strong> {{ flashcard()!.niveauId }}</p>
+      </app-card>
+
+      <!-- Difficulté -->
+      <app-card>
+        <h3 class="detail-title">Difficulté</h3>
+        <span class="badge {{ getDifficulteClass(flashcard()!.niveauDifficulte) }}">
+          {{ getDifficulteLabel(flashcard()!.niveauDifficulte) }}
+        </span>
+      </app-card>
+
+      <!-- Date de création -->
+      <app-card>
+        <h3 class="detail-title">Date de création</h3>
+        <p>{{ flashcard()?.dateCreation | date:'dd/MM/yyyy à HH:mm' }}</p>
+      </app-card>
+
+      <!-- Tags -->
+      <app-card *ngIf="flashcard()?.tags?.length">
+        <h3 class="detail-title">Tags</h3>
+        <div class="tags-list">
+          <span class="tag" *ngFor="let tag of flashcard()!.tags">{{ tag }}</span>
+        </div>
+      </app-card>
+
+      <!-- Statistiques -->
+      <app-card>
+        <h3 class="detail-title">Consultations</h3>
+        <p><strong>Total :</strong> {{ flashcard()?.consultations?.length || 0 }}</p>
+      </app-card>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <ng-template #loader>
+    <div class="loader-container">
+      <p>Chargement de la flashcard...</p>
+    </div>
+  </ng-template>
+</app-admin-layout>

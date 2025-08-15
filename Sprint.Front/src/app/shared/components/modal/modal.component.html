@@ -1,0 +1,31 @@
+<!-- src/app/shared/components/modal/modal.component.html -->
+<div
+  class="modal-overlay"
+  [class.visible]="visible"
+  (click)="onOverlayClick($event)"
+  (document:keydown)="handleEscape($event)"
+  *ngIf="visible"
+>
+  <div class="modal-container" (click)="stopPropagation($event)">
+    <div class="modal-header">
+      <h3 class="modal-title">{{ title }}</h3>
+      <button
+        class="modal-close"
+        (click)="close()"
+        *ngIf="closable"
+        aria-label="Fermer la modale"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <ng-content></ng-content>
+    </div>
+
+    <!-- Footer conditionnel -->
+    <div class="modal-footer" *ngIf="hasFooter" #modalFooter>
+      <ng-content select="[modal-footer]"></ng-content>
+    </div>
+  </div>
+</div>

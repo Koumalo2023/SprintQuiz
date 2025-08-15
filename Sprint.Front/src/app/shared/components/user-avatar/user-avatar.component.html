@@ -1,0 +1,5 @@
+<!-- src/app/shared/components/user-avatar/user-avatar.component.html -->
+<div [class]="avatarClass">
+  <img *ngIf="imageUrl" [src]="imageUrl" [alt]="name" class="user-avatar__img" />
+  <span *ngIf="!imageUrl" class="user-avatar__initials">{{ initials }}</span>
+</div>

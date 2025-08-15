@@ -1,0 +1,123 @@
+<app-admin-layout>
+  <!-- En-tête -->
+  <div header-title>
+    <h1>{{ isEditMode ? 'Modifier le sprint' : 'Nouveau sprint' }}</h1>
+    <p class="admin-subtitle">
+      {{ isEditMode 
+        ? 'Modifiez les informations du sprint, y compris son ordre dans la séquence.' 
+        : 'Créez un nouveau sprint avec un ordre défini dans la progression globale.' }}
+    </p>
+  </div>
+
+  <!-- Onglets -->
+  <app-tabs [tabs]="tabs" [activeTab]="activeTab" (tabChange)="onTabChange($event)">
+  </app-tabs>
+
+  <!-- Contenu -->
+  <div class="tab-content-container" *ngIf="!loading; else loader">
+    <div *ngIf="activeTab === 0" class="form-section">
+      <h3>Informations du sprint</h3>
+      <form (ngSubmit)="onSubmit()" #sprintForm="ngForm">
+        <!-- Nom -->
+        <div class="form-group">
+          <label for="nom">Nom du sprint *</label>
+          <input
+            type="text"
+            id="nom"
+            class="form-control"
+            name="nom"
+            [(ngModel)]="sprint.nom"
+            required
+            minlength="2"
+            maxlength="100"
+          />
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            class="form-control"
+            name="description"
+            [(ngModel)]="sprint.description"
+            rows="4"
+            maxlength="500"
+          ></textarea>
+        </div>
+
+        <!-- Ordre -->
+        <div class="form-group">
+          <label for="ordre">Ordre dans la séquence *</label>
+          <input
+            type="number"
+            id="ordre"
+            class="form-control"
+            name="ordre"
+            [(ngModel)]="sprint.ordre"
+            required
+            min="1"
+            placeholder="Ex: 1, 2, 3..."
+          />
+          <small class="text-muted">L’ordre détermine la position du sprint dans la progression.</small>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" (click)="onCancel()">
+            Annuler
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="loading || sprintForm.invalid">
+            {{ isEditMode ? 'Mettre à jour' : 'Créer le sprint' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Onglet 2 : Modules liés -->
+    <div *ngIf="activeTab === 1" class="form-section">
+      <h3>Modules associés</h3>
+      <p>Cette section sera activée après la création du sprint.</p>
+      <div class="info-box" *ngIf="!isEditMode">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span>Vous pourrez lier des modules une fois le sprint créé.</span>
+      </div>
+      <app-search-bar
+        placeholder="Rechercher un module..."
+        (search)="onModuleSearch($event)"
+        *ngIf="isEditMode"
+      ></app-search-bar>
+      <div class="modules-list" *ngIf="isEditMode && filteredModules.length > 0; else noModules">
+        <div *ngFor="let module of filteredModules" class="module-item">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="isModuleSelected(module.id)"
+              (change)="toggleModule(module.id)"
+            />
+            {{ module.nom }}
+          </label>
+          <span class="module-desc">{{ module.description }}</span>
+        </div>
+      </div>
+      <ng-template #noModules>
+        <p class="text-muted">Aucun module disponible.</p>
+      </ng-template>
+    </div>
+
+    <!-- Onglet 3 : Contenus -->
+    <div *ngIf="activeTab === 2" class="form-section">
+      <h3>Quiz et Flashcards</h3>
+      <p>Les contenus sont gérés via les modules et cours associés.</p>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <ng-template #loader>
+    <app-loader></app-loader>
+  </ng-template>
+</app-admin-layout>

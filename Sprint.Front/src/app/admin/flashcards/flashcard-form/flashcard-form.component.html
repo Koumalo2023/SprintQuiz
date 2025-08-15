@@ -1,0 +1,192 @@
+<app-admin-layout>
+  <h1 header-title>{{ isEditMode() ? 'Modifier' : 'Nouvelle' }} Flashcard</h1>
+  <p class="admin-subtitle">Associez une flashcard à un Sprint, un Module ou un Cours.</p>
+
+  <!-- Mode groupé -->
+  <div class="bulk-toggle">
+    <label class="checkbox-label">
+      <input type="checkbox" (change)="toggleBulkMode()" />
+      Création groupée (via JSON)
+    </label>
+  </div>
+
+  <!-- Upload JSON -->
+  @if (isBulkMode) {
+  <div class="form-group">
+    <label>Importer depuis un fichier JSON</label>
+    <input
+      type="file"
+      accept=".json"
+      (change)="onFileSelected($event)"
+      class="form-control"
+    />
+    <small class="text-muted">
+      Format attendu : array de {{ '{' }} "question", "reponse", "tags"?, "niveauDifficulte"? {{ '}' }}
+    </small>
+  </div>
+}
+
+  <div class="form-container" *ngIf="!loading(); else loader">
+    <form (ngSubmit)="onSubmit()" #form="ngForm">
+      <!-- Question -->
+      <div class="form-group">
+        <label for="question">Question *</label>
+        <textarea
+          id="question"
+          name="question"
+          class="form-control"
+          [(ngModel)]="flashcard.question"
+          rows="3"
+          required
+          maxlength="500"
+        ></textarea>
+      </div>
+
+      <!-- Réponse -->
+      <div class="form-group">
+        <label for="reponse">Réponse *</label>
+        <textarea
+          id="reponse"
+          name="reponse"
+          class="form-control"
+          [(ngModel)]="flashcard.reponse"
+          rows="4"
+          required
+          maxlength="1000"
+        ></textarea>
+      </div>
+
+      <!-- Niveau -->
+      <div class="form-group">
+        <label>Niveau de rattachement *</label>
+        <div class="radio-group">
+          @for (niveau of [NiveauEnum.Sprint, NiveauEnum.Module, NiveauEnum.Cours]; track $index) {
+            <label class="radio-label">
+              <input
+                type="radio"
+                name="niveau"
+                [value]="niveau"
+                [(ngModel)]="flashcard.niveau"
+                (change)="onNiveauChange()"
+              />
+              {{ niveau === NiveauEnum.Sprint ? 'Sprint' : niveau === NiveauEnum.Module ? 'Module' : 'Cours' }}
+            </label>
+          }
+        </div>
+      </div>
+
+      <!-- Sélecteur Sprint -->
+      <div class="form-group">
+        <label>Sprint *</label>
+        <select
+          name="sprint"
+          class="form-control"
+          [(ngModel)]="selectedSprintId"
+          (ngModelChange)="loadModules($event)"
+          required
+        >
+          <option value="" disabled>Sélectionner un sprint</option>
+          @for (sprint of sprints; track sprint.id) {
+            <option [value]="sprint.id">{{ sprint.nom }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Sélecteur Module -->
+      @if (flashcard.niveau === NiveauEnum.Module || flashcard.niveau === NiveauEnum.Cours) {
+        <div class="form-group">
+          <label>Module *</label>
+          <select
+            name="module"
+            class="form-control"
+            [disabled]="modules.length === 0"
+            [(ngModel)]="selectedModuleId"
+            (ngModelChange)="loadCours($event)"
+            required
+          >
+            <option value="" disabled>
+              {{ modules.length ? 'Sélectionner un module' : 'Aucun module disponible' }}
+            </option>
+            @for (module of modules; track module.id) {
+              <option [value]="module.id">{{ module.nom }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <!-- Sélecteur Cours -->
+      @if (flashcard.niveau === NiveauEnum.Cours) {
+        <div class="form-group">
+          <label>Cours *</label>
+          <select
+            name="cours"
+            class="form-control"
+            [(ngModel)]="flashcard.niveauId"
+            required
+          >
+            <option value="" disabled>
+              {{ cours.length ? 'Sélectionner un cours' : 'Aucun cours disponible' }}
+            </option>
+            @for (course of cours; track course.id) {
+              <option [value]="course.id">{{ course.titre }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <!-- Difficulté -->
+      <div class="form-group">
+        <label>Difficulté</label>
+        <select
+          name="difficulte"
+          class="form-control"
+          [(ngModel)]="flashcard.niveauDifficulte"
+        >
+          <option [value]="NiveauDifficulte.Facile">Facile</option>
+          <option [value]="NiveauDifficulte.Moyen">Moyen</option>
+          <option [value]="NiveauDifficulte.Difficile">Difficile</option>
+        </select>
+      </div>
+
+      <!-- Tags -->
+      <div class="form-group">
+        <label>Tags</label>
+        <div class="tag-input-group">
+          <input
+            type="text"
+            placeholder="Appuyez sur Entrée pour ajouter"
+            [(ngModel)]="tagInput"
+            name="tagInput"
+            (keyup.enter)="addTag(); $event.preventDefault()"
+            class="form-control"
+          />
+          <button type="button" class="btn btn-sm btn-primary" (click)="addTag()">Ajouter</button>
+        </div>
+
+        <!-- Affichage des tags -->
+        @if (flashcard.tags?.length) {
+          <div class="tag-list">
+            @for (tag of flashcard.tags; track tag) {
+              <span class="tag">
+                {{ tag }}
+                <button type="button" (click)="removeTag(tag)" class="tag-remove">×</button>
+              </span>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" (click)="onCancel()">Annuler</button>
+        <button type="submit" class="btn btn-primary" [disabled]="loading()">
+          {{ isBulkMode ? 'Importer' : (isEditMode() ? 'Mettre à jour' : 'Créer') }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <ng-template #loader>
+    <app-loader></app-loader>
+  </ng-template>
+</app-admin-layout>

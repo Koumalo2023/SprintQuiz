@@ -1,0 +1,70 @@
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+.exercise-card {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $border-radius-lg;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  &__header {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: $dark;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.4;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    color: $gray;
+  }
+
+  &__tags {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  &__status {
+    text-align: right;
+  }
+}
+
+// Réutilisation des classes existantes
+.badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: $border-radius;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: $border-radius;
+  background: $warning;
+  color: $white;
+  font-weight: 500;
+}

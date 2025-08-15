@@ -1,0 +1,54 @@
+.exercise-progress-tracker {
+  margin: 1.5rem 0;
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: $dark;
+    margin: 0 0 1rem 0;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  &__item {
+    font-size: 0.9rem;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    color: $gray-dark;
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+  }
+
+  &__value {
+    font-weight: 600;
+    color: $dark;
+  }
+
+  &__bar {
+    height: 6px;
+    background: $border;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    background: $primary;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+}

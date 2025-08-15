@@ -1,0 +1,24 @@
+<!-- src/app/shared/components/progress-ring/progress-ring.component.html -->
+<div class="progress-ring" [class]="'progress-ring--' + size">
+  <svg viewBox="0 0 100 100">
+    <circle
+      class="progress-ring__background"
+      cx="50"
+      cy="50"
+      r="45"
+      fill="none"
+    />
+    <circle
+      class="progress-ring__fill"
+      cx="50"
+      cy="50"
+      r="45"
+      fill="none"
+      [style.stroke-dasharray]="283"
+      [style.stroke-dashoffset]="283 - (percent / 100) * 283"
+    />
+  </svg>
+  <div class="progress-ring__label" *ngIf="showLabel">
+    {{ percent }}%
+  </div>
+</div>

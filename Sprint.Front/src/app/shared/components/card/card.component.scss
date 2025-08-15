@@ -1,0 +1,153 @@
+
+// src/app/shared/components/card/card.component.scss
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+.card {
+  background: $light;
+  border: 1px solid $border;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: default;
+
+  &--clickable {
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+      border-color: rgba($primary, 0.2);
+    }
+  }
+
+  &--disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    background: $lighter;
+    border-color: $border;
+  }
+
+  &-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid $border;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: $white;
+  }
+
+  &-icon {
+    width: 32px;
+    height: 32px;
+    background: $gradient-accent;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary;
+    font-size: 16px;
+    flex-shrink: 0;
+
+    // Exemple d'icônes (tu peux les remplacer par des SVG ou Font Icons)
+    &.icon-sprint::before { content: '🚀'; }
+    &.icon-module::before { content: '📚'; }
+    &.icon-cours::before { content: '📘'; }
+    &.icon-quiz::before { content: '❓'; }
+    &.icon-flashcard::before { content: '🔖'; }
+  }
+
+  &-title-group {
+    flex: 1;
+  }
+
+  &-title {
+    font-size: 16px;
+    font-weight: $font-weight-semibold;
+    color: $dark;
+    margin: 0;
+  }
+
+  &-subtitle {
+    font-size: 12px;
+    color: $gray;
+    margin: 2px 0 0;
+  }
+
+  &-body {
+    padding: 24px;
+    color: $dark;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  &-footer {
+    padding: 16px 24px;
+    background: $lighter;
+    border-top: 1px solid $border;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: $gray;
+  }
+
+  &-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    margin-left: 16px;
+  }
+
+  &-progress-bar {
+    flex: 1;
+    height: 6px;
+    background: $border;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  &-progress-fill {
+    height: 100%;
+    background: $primary;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  &-progress-label {
+    color: $dark;
+    font-weight: $font-weight-semibold;
+    min-width: 36px;
+    text-align: right;
+  }
+}
+
+.card {
+  position: relative;
+
+  &-badges {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 6px;
+    z-index: 1;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+
+// Réutilisation du style des badges
+.badge {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: $border-radius;
+  color: #FFFFFF;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}

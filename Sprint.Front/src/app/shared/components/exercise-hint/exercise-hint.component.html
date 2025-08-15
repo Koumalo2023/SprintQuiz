@@ -1,0 +1,18 @@
+<div class="exercise-hint">
+  <button
+    class="exercise-hint__toggle"
+    (click)="toggleVisibility()"
+    [attr.aria-expanded]="isVisible"
+  >
+    <i class="icon bulb"></i>
+    <span>{{ isVisible ? 'Masquer l’indice' : '💡 Voir un indice' }}</span>
+  </button>
+
+  <div
+    class="exercise-hint__content"
+    *ngIf="isVisible"
+    @fadeIn
+  >
+    <p>{{ hint.texte }}</p>
+  </div>
+</div>

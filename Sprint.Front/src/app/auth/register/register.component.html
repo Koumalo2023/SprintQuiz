@@ -1,0 +1,118 @@
+<!-- src/app/auth/register/register.component.html -->
+<app-auth-layout>
+  <div class="register-container">
+    <div class="register-header">
+      <h1 class="register-title">Créer un utilisateur</h1>
+      <p class="register-subtitle">Remplissez le formulaire ci-dessous pour ajouter un nouvel utilisateur.</p>
+    </div>
+
+    <!-- Message d'erreur -->
+    @if (errorMessage) {
+      <div class="error-message show">{{ errorMessage }}</div>
+    }
+
+    <!-- Formulaire d'inscription -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+      <!-- Nom -->
+      <div class="form-group">
+        <label for="nom" class="form-label">Nom complet</label>
+        <div class="input-with-icon">
+          <input
+            id="nom"
+            type="text"
+            formControlName="nom"
+            class="form-input"
+            placeholder="Nom de l'utilisateur"
+          />
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email" class="form-label">Adresse email</label>
+        <div class="input-with-icon">
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-input"
+            placeholder="utilisateur@exemple.com"
+          />
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Mot de passe -->
+      <div class="form-group">
+        <label for="motDePasse" class="form-label">Mot de passe</label>
+        <div class="input-with-icon">
+          <input
+            id="motDePasse"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="motDePasse"
+            class="form-input"
+            placeholder="••••••••"
+          />
+          <svg (click)="togglePassword()" class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Confirmer mot de passe -->
+      <div class="form-group">
+        <label for="confirmPassword" class="form-label">Confirmer le mot de passe</label>
+        <div class="input-with-icon">
+          <input
+            id="confirmPassword"
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            formControlName="confirmPassword"
+            class="form-input"
+            placeholder="••••••••"
+          />
+          <svg (click)="toggleConfirmPassword()" class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        </div>
+        @if (registerForm.errors?.['mismatch']) {
+          <div class="form-error">Les mots de passe ne correspondent pas.</div>
+        }
+      </div>
+
+      <!-- Rôle -->
+      <div class="form-group">
+        <label for="role" class="form-label">Rôle</label>
+        <select id="role" formControlName="role" class="form-input">
+          <option [value]="roles.Etudiant">Étudiant</option>
+          <option [value]="roles.Admin">Administrateur</option>
+        </select>
+      </div>
+
+      <!-- Boutons -->
+      <div class="register-actions">
+        <button type="button" (click)="onCancel()" class="app-button secondary">
+          Annuler
+        </button>
+        <button
+          type="submit"
+          class="app-button primary"
+          [disabled]="isLoading || registerForm.invalid"
+        >
+          @if (isLoading) {
+            <span>Création...</span>
+            <div class="loading"></div>
+          } @else {
+            Créer l'utilisateur
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</app-auth-layout>

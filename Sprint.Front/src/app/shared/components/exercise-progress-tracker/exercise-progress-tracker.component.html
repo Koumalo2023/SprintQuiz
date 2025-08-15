@@ -1,0 +1,28 @@
+<div class="exercise-progress-tracker">
+  <h4 class="exercise-progress-tracker__title">Progression des exercices</h4>
+
+  <div class="exercise-progress-tracker__list">
+    <div
+      class="exercise-progress-tracker__item"
+      *ngFor="let item of items"
+    >
+      <div class="exercise-progress-tracker__header">
+        <span class="exercise-progress-tracker__label">
+          <i class="icon {{ getIcon(item.type) }}"></i>
+          {{ item.titre }}
+        </span>
+        <span class="exercise-progress-tracker__value">
+          {{ item.maitrises }}/{{ item.total }}
+        </span>
+      </div>
+
+      <div class="exercise-progress-tracker__bar">
+        <div
+          class="exercise-progress-tracker__fill"
+          [style.width.%]="getProgress(item)"
+          [style.background]="getProgressColor(item)"
+        ></div>
+      </div>
+    </div>
+  </div>
+</div>

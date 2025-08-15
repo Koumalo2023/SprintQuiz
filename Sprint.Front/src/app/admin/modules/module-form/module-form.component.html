@@ -1,0 +1,127 @@
+<app-admin-layout>
+  <!-- En-tête -->
+  <div header-title>
+    <h1>{{ isEditMode ? 'Modifier le module' : 'Nouveau module' }}</h1>
+    <p class="admin-subtitle">
+      {{ isEditMode 
+        ? 'Modifiez les informations du module et son lien éventuel avec un sprint.' 
+        : 'Créez un nouveau module et liez-le à un sprint si nécessaire.' }}
+    </p>
+  </div>
+
+  <!-- Onglets -->
+  <app-tabs [tabs]="tabs" [activeTab]="activeTab" (tabChange)="onTabChange($event)">
+  </app-tabs>
+
+  <!-- Contenu -->
+  <div class="tab-content-container" *ngIf="!loading; else loader">
+    <!-- Onglet 1 : Informations -->
+    <div *ngIf="activeTab === 0" class="form-section">
+      <h3>Informations du module</h3>
+      <form (ngSubmit)="onSubmit()" #moduleForm="ngForm">
+        <!-- Nom -->
+        <div class="form-group">
+          <label for="nom">Nom du module *</label>
+          <input
+            type="text"
+            id="nom"
+            class="form-control"
+            name="nom"
+            [(ngModel)]="module.nom"
+            required
+            minlength="2"
+            maxlength="100"
+          />
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            class="form-control"
+            name="description"
+            [(ngModel)]="module.description"
+            rows="4"
+            maxlength="500"
+          ></textarea>
+        </div>
+
+        <!-- Ordre -->
+        <div class="form-group">
+          <label for="ordre">Ordre *</label>
+          <input
+            type="number"
+            id="ordre"
+            class="form-control"
+            name="ordre"
+            [(ngModel)]="module.ordre"
+            required
+            min="1"
+            placeholder="Ex: 1, 2, 3..."
+          />
+        </div>
+
+        <!-- Sprint -->
+        <div class="form-group">
+          <label for="sprint">Sprint associé (optionnel)</label>
+          <app-search-bar
+            placeholder="Rechercher un sprint..."
+            (search)="onSprintSearch($event)"
+          ></app-search-bar>
+          <select
+            id="sprint"
+            class="form-control"
+            [(ngModel)]="module.sprintId"
+            name="sprintId"
+          >
+            <option value="">Aucun sprint</option>
+            <option *ngFor="let s of filteredSprints" [value]="s.id">
+              {{ s.nom }} (Ordre {{ s.ordre }})
+            </option>
+          </select>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" (click)="onCancel()">
+            Annuler
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="loading || moduleForm.invalid">
+            {{ isEditMode ? 'Mettre à jour' : 'Créer le module' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Onglet 2 : Import JSON -->
+    <div *ngIf="activeTab === 1" class="form-section">
+      <h3>Création groupée via JSON</h3>
+      <p>Importez plusieurs modules à la fois en uploadant un fichier JSON.</p>
+
+      <div class="info-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        <span>Format attendu : tableau d'objets avec <code>nom</code>, <code>description</code>, <code>ordre</code>, <code>sprintId</code></span>
+      </div>
+
+      <div class="json-upload-area">
+        <label class="btn btn-outline btn-file">
+          📁 Choisir un fichier JSON
+          <input type="file" accept=".json" (change)="onFileSelected($event)" hidden />
+        </label>
+        <p class="text-muted" *ngIf="!loading">Uniquement les fichiers .json</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <ng-template #loader>
+    <app-loader></app-loader>
+  </ng-template>
+</app-admin-layout>

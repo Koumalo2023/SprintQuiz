@@ -1,0 +1,74 @@
+<app-admin-layout>
+    <!-- En-tête -->
+    <div header-title>
+        <h1>{{ quiz()?.titre || 'Détail du quiz' }}</h1>
+        <p class="admin-subtitle">{{ quiz()?.description || 'Aucune description' }}</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="admin-header-actions">
+        <a class="btn btn-outline" routerLink="/admin/quiz">
+            ← Retour à la liste
+        </a>
+        <div class="btn-group">
+            <button class="btn btn-secondary" (click)="onEdit()">Modifier</button>
+            <button class="btn btn-danger" (click)="onDelete()">Supprimer</button>
+        </div>
+    </div>
+
+
+
+    <!-- Contenu -->
+    <div class="quiz-detail-container" *ngIf="!loading() && quiz() as q">
+        <!-- Statistiques principales -->
+        <div class="admin-stats-grid">
+            <app-stats-card [value]="getNbQuestions()" label="Questions" icon="quiz" />
+            <app-stats-card [value]="getNbTentatives()" label="Tentatives" icon="users" />
+            <app-stats-card [value]="tauxReussiteGlobal() ?? '–'"
+                [label]="tauxReussiteGlobal() !== null ? 'Taux de réussite moyen' : 'Aucune tentative'" icon="progress"
+                [trend]="tauxReussiteGlobal() !== null && tauxReussiteGlobal()! > 70 ? 'up' : 'down'"
+                [trendValue]="tauxReussiteGlobal() !== null ? (tauxReussiteGlobal() + '%') : ''" />
+            <div class="admin-stat-card context">
+                <div class="admin-stat-header">
+                    <div class="admin-stat-icon" [class]="contextType()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-width="2"
+                                stroke-linejoin="round" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <h3>{{ contextType() === 'inconnu' ? 'Contexte' : (contextType() === 'sprint' ? 'Sprint' :
+                        (contextType() === 'module' ? 'Module' : 'Cours')) }}</h3>
+                </div>
+                <div class="admin-stat-value">{{ contextNom() }}</div>
+            </div>
+        </div>
+
+        <!-- Questions -->
+        <div class="questions-section">
+            <h2 class="section-title">Questions du quiz</h2>
+            @for (question of q.questions; track question.id) {
+            <app-card [title]="question.intitule" [subtitle]="'Difficulté : ' + question.niveauDifficulte"
+                [icon]="'icon-question'">
+                <div class="options-list">
+                    @for (option of question.options; track option.id) {
+                    <div class="option-item" [class.correct]="option.estCorrecte">
+                        <span class="option-letter">
+                            {{ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.charAt($index) }}
+                        </span>
+                        <span class="option-text">{{ option.texte }}</span>
+                        @if (option.estCorrecte) {
+                        <span class="badge correct">Correcte</span>
+                        }
+                    </div>
+                    }
+                </div>
+                @if (question.explication) {
+                <div class="explication">
+                    <strong>Explication :</strong> {{ question.explication }}
+                </div>
+                }
+            </app-card>
+            }
+        </div>
+    </div>
+</app-admin-layout>

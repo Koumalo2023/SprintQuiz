@@ -1,0 +1,49 @@
+//styles/base/_base.scss
+
+// Style global de base
+@use '../abstracts/variables' as *;
+* {
+  scroll-behavior: smooth;
+}
+
+html {
+  font-size: 100%;
+}
+
+body {
+  background: $light;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $spacer;
+}
+
+// Classes utilitaires
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.mt-1 { margin-top: $spacer-sm; }
+.mt-2 { margin-top: $spacer; }
+.mt-3 { margin-top: $spacer-lg; }
+.mb-1 { margin-bottom: $spacer-sm; }
+.mb-2 { margin-bottom: $spacer; }
+.mb-3 { margin-bottom: $spacer-lg; }
+.pt-1 { padding-top: $spacer-sm; }
+.pb-1 { padding-bottom: $spacer-sm; }
+
+// Visibilité
+.hidden {
+  display: none !important;
+}
+
+// Animation globale
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}

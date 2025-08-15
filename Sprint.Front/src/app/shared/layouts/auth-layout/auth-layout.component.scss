@@ -1,0 +1,80 @@
+//src/app/shared/layouts/auth-layout.component.scss
+
+// @use 'layout/auth-layout'; // ✅ Importe le style global SCSS
+
+@use '../../../../styles/abstracts/mixins' as *;
+@use '../../../../styles/abstracts/variables' as *;
+
+// Style local optionnel (animations, comportements spécifiques)
+.auth-layout {
+  .particle {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+
+    &:nth-child(1) {
+      width: 80px; height: 80px;
+      top: 20%; left: 10%;
+      animation-delay: 0s;
+    }
+    &:nth-child(2) {
+      width: 120px; height: 120px;
+      top: 60%; right: 15%;
+      animation-delay: 2s;
+    }
+    &:nth-child(3) {
+      width: 60px; height: 60px;
+      bottom: 30%; left: 20%;
+      animation-delay: 4s;
+    }
+    &:nth-child(4) {
+      width: 100px; height: 100px;
+      top: 10%; right: 30%;
+      animation-delay: 1s;
+    }
+  }
+}
+
+.admin-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 280px;
+  height: 100vh;
+  background: $primary;
+  padding: 24px 0;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+
+  // Masquer la sidebar par défaut en mode mobile
+  @include respond($breakpoint-md) {
+    transform: translateX(-100%);
+  }
+}
+
+@include respond($breakpoint-md) {
+  .admin-sidebar.mobile-hidden {
+    transform: translateX(-100%);
+  }
+
+  .admin-mobile-menu-toggle {
+    display: none;
+  }
+
+  .admin-main-content {
+    margin-left: 280px;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+    opacity: 1;
+  }
+}
