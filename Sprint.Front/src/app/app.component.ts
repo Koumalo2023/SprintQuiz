@@ -10,5 +10,5 @@ import { NotificationComponent } from './shared/components/notification/notifica
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'client';
+  title = 'Tratenze';
 }
