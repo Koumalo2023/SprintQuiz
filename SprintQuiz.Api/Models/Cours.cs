@@ -3,20 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SprintQuiz.Api.Models
 {
-    public class Cours
+    public class Cours: NiveauPedagogique
     {
-        [Key]
-        public Guid Id { get; set; }
+        
 
-        [Required]
-        [MaxLength(200)]
-        public string Titre { get; set; } = string.Empty;
-
-        [MaxLength(10000)]
-        public string? Description { get; set; }
-
-        [Required]
-        public int Ordre { get; set; }
 
         [Required]
         [ForeignKey(nameof(Module))]
