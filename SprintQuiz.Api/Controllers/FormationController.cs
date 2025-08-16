@@ -1,20 +1,22 @@
+// Controllers/FormationController.cs
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SprintQuiz.Api.DTOs;
 using SprintQuiz.Api.Services;
-using Microsoft.AspNetCore.Authorization;
 
 namespace SprintQuiz.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class SprintController : ControllerBase
+    public class FormationController : ControllerBase
     {
-        private readonly ISprintService _sprintService;
+        private readonly IFormationService _formationService;
 
-        public SprintController(ISprintService sprintService)
+        public FormationController(IFormationService formationService)
         {
-            _sprintService = sprintService;
+            _formationService = formationService;
         }
+
         private Guid? GetUserId()
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
@@ -24,61 +26,45 @@ namespace SprintQuiz.Api.Controllers
         }
 
         /// <summary>
-        /// Récupère tous les sprints (Public)
+        /// Récupère toutes les formations (Public)
         /// </summary>
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<SprintDto>>> GetAll()
+        public async Task<ActionResult<IEnumerable<FormationDto>>> GetAll()
         {
-            var sprints = await _sprintService.GetAllAsync();
-            return Ok(sprints);
+            var formations = await _formationService.GetAllAsync();
+            return Ok(formations);
         }
 
         /// <summary>
-        /// Récupère un sprint par ID (Public)
+        /// Récupère une formation par ID (Public)
         /// </summary>
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<SprintDto>> GetById(Guid id)
+        public async Task<ActionResult<FormationDto>> GetById(Guid id)
         {
             var utilisateurId = GetUserId();
-            var dto = await _sprintService.GetByIdAsync(id, utilisateurId);
+            var dto = await _formationService.GetByIdAsync(id, utilisateurId);
 
             if (dto == null)
-                return NotFound($"Sprint avec l'ID {id} non trouvé.");
+                return NotFound($"Formation avec l'ID {id} non trouvée.");
 
             return Ok(dto);
         }
 
         /// <summary>
-        /// Récupère un sprint avec ses modules (Public)
-        /// </summary>
-        [HttpGet("{id}/modules")]
-        [AllowAnonymous]
-        public async Task<ActionResult<SprintDto>> GetWithModules(Guid id)
-        {
-            var utilisateurId = GetUserId();
-            var dto = await _sprintService.GetWithModulesAsync(id, utilisateurId);
-
-            if (dto == null)
-                return NotFound($"Sprint avec l'ID {id} non trouvé.");
-
-            return Ok(dto);
-        }
-
-        /// <summary>
-        /// Crée un nouveau sprint (Admin)
+        /// Crée une nouvelle formation (Admin)
         /// </summary>
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<SprintDto>> Create([FromBody] CreateSprintDto createDto)
+        public async Task<ActionResult<FormationDto>> Create([FromBody] CreateFormationDto createDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var created = await _sprintService.CreateAsync(createDto);
+                var created = await _formationService.CreateAsync(createDto);
                 return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
             }
             catch (Exception ex)
@@ -88,22 +74,23 @@ namespace SprintQuiz.Api.Controllers
         }
 
         /// <summary>
-        /// Met à jour un sprint existant (Admin)
+        /// Met à jour une formation (Admin)
         /// </summary>
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<SprintDto>> Update(Guid id, [FromBody] UpdateSprintDto updateDto)
+        public async Task<ActionResult<FormationDto>> Update(Guid id, [FromBody] UpdateFormationDto updateDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var updated = await _sprintService.UpdateAsync(id, updateDto);
-                if (updated == null)
-                    return NotFound($"Sprint avec l'ID {id} non trouvé.");
-
+                var updated = await _formationService.UpdateAsync(id, updateDto);
                 return Ok(updated);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound($"Formation avec l'ID {id} non trouvée.");
             }
             catch (Exception ex)
             {
@@ -112,13 +99,13 @@ namespace SprintQuiz.Api.Controllers
         }
 
         /// <summary>
-        /// Supprime un sprint (Admin)
+        /// Supprime une formation (Admin)
         /// </summary>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var deleted = await _sprintService.DeleteAsync(id);
+            var deleted = await _formationService.DeleteAsync(id);
             if (!deleted)
                 return NotFound();
 
@@ -126,4 +113,3 @@ namespace SprintQuiz.Api.Controllers
         }
     }
 }
-

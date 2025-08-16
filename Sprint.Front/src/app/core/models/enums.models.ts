@@ -3,7 +3,8 @@
 export enum NiveauEnum {
     Cours = 0,
     Module = 1,
-    Sprint = 2
+    Sprint = 2,
+    formation = 3
 }
 
 export enum NiveauDifficulte {

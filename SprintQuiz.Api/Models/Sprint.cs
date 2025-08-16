@@ -2,20 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SprintQuiz.Api.Models
 {
-    public class Sprint
+    public class Sprint:NiveauPedagogique
     {
-        [Key]
-        public Guid Id { get; set; }
-
-        [Required]
-        [MaxLength(200)]
-        public string Nom { get; set; } = string.Empty;
-
-        [MaxLength(3000)]
-        public string? Description { get; set; }
-
-        [Required]
-        public int Ordre { get; set; }
+        public Guid FormationId { get; set; }
+        public virtual Formation Formation { get; set; } = null!;
 
         // Navigation properties
         public virtual ICollection<Module> Modules { get; set; } = new List<Module>();

@@ -4,13 +4,14 @@ namespace SprintQuiz.Api.Services
 {
     public interface IModuleService
     {
-        Task<IEnumerable<ModuleDto>> GetAllModulesAsync();
-        Task<ModuleDto?> GetModuleByIdAsync(Guid id);
-        Task<ModuleDto?> GetModuleWithCoursAsync(Guid id);
-        Task<IEnumerable<ModuleDto>> GetModulesBySprintIdAsync(Guid sprintId);
-        Task<ModuleDto> CreateModuleAsync(CreateModuleDto createModuleDto);
-        Task<ModuleDto?> UpdateModuleAsync(Guid id, UpdateModuleDto updateModuleDto);
-        Task<bool> DeleteModuleAsync(Guid id);
+        Task<IEnumerable<ModuleDto>> GetAllAsync();
+        Task<ModuleDto?> GetByIdAsync(Guid id, Guid? utilisateurId = null);
+        Task<ModuleDto?> GetWithCoursAsync(Guid id, Guid? utilisateurId = null);
+        Task<ModuleDto> CreateAsync(CreateModuleDto createDto);
+        Task<ModuleDto?> UpdateAsync(Guid id, UpdateModuleDto updateDto);
+        Task<bool> DeleteAsync(Guid id);
+        Task<bool> ExistsAsync(Guid id);
+        Task<IEnumerable<ModuleDto>> GetBySprintIdAsync(Guid sprintId, Guid? utilisateurId = null);
     }
 }
 

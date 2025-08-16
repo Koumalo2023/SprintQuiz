@@ -4,6 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using SprintQuiz.Api.Data;
 using SprintQuiz.Api.Repositories;
 using SprintQuiz.Api.Services;
+using SprintQuiz.Data.Repositories;
+using SprintQuiz.Services;
 using System.Text;
 
 namespace SprintQuiz.Api.Extensions
@@ -30,6 +32,7 @@ namespace SprintQuiz.Api.Extensions
 
         private static IServiceCollection AddRepositories(this IServiceCollection services)
         {
+            services.AddScoped<IFormationRepository, FormationRepository>();
             services.AddScoped<ISprintRepository, SprintRepository>();
             services.AddScoped<IModuleRepository, ModuleRepository>();
             services.AddScoped<ICoursRepository, CoursRepository>();
@@ -42,6 +45,7 @@ namespace SprintQuiz.Api.Extensions
         private static IServiceCollection AddBusinessServices(this IServiceCollection services)
         {
             services.AddScoped<ISprintService, SprintService>();
+            services.AddScoped<IFormationService, FormationService>();
             services.AddScoped<IModuleService, ModuleService>();
             services.AddScoped<ICoursService, CoursService>();
             services.AddScoped<IQuizService, QuizService>();

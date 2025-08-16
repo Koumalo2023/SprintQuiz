@@ -15,98 +15,124 @@ namespace SprintQuiz.Api.Controllers
         {
             _moduleService = moduleService;
         }
+        private Guid? GetUserId()
+        {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            return userIdClaim?.Value != null && Guid.TryParse(userIdClaim.Value, out var userId)
+                ? userId
+                : null;
+        }
 
         /// <summary>
-        /// Récupère tous les modules
+        /// Récupère tous les modules (Public)
         /// </summary>
         [HttpGet]
-        [AllowAnonymous] // Accessible par tous
-        public async Task<ActionResult<IEnumerable<ModuleDto>>> GetAllModules()
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<ModuleDto>>> GetAll()
         {
-            var modules = await _moduleService.GetAllModulesAsync();
+            var modules = await _moduleService.GetAllAsync();
             return Ok(modules);
         }
 
         /// <summary>
-        /// Récupère un module par son ID
+        /// Récupère un module par ID (Public)
         /// </summary>
         [HttpGet("{id}")]
-        [AllowAnonymous] // Accessible par tous
-        public async Task<ActionResult<ModuleDto>> GetModuleById(Guid id)
+        [AllowAnonymous]
+        public async Task<ActionResult<ModuleDto>> GetById(Guid id)
         {
-            var module = await _moduleService.GetModuleByIdAsync(id);
-            if (module == null)
-                return NotFound($"Module avec l'ID {id} non trouvé");
+            var utilisateurId = GetUserId();
+            var dto = await _moduleService.GetByIdAsync(id, utilisateurId);
 
-            return Ok(module);
+            if (dto == null)
+                return NotFound($"Module avec l'ID {id} non trouvé.");
+
+            return Ok(dto);
         }
 
         /// <summary>
-        /// Récupère un module avec ses cours
+        /// Récupère un module avec ses cours (Public)
         /// </summary>
         [HttpGet("{id}/cours")]
-        [AllowAnonymous] // Accessible par tous
-        public async Task<ActionResult<ModuleDto>> GetModuleWithCours(Guid id)
+        [AllowAnonymous]
+        public async Task<ActionResult<ModuleDto>> GetWithCours(Guid id)
         {
-            var module = await _moduleService.GetModuleWithCoursAsync(id);
-            if (module == null)
-                return NotFound($"Module avec l'ID {id} non trouvé");
+            var utilisateurId = GetUserId();
+            var dto = await _moduleService.GetWithCoursAsync(id, utilisateurId);
 
-            return Ok(module);
+            if (dto == null)
+                return NotFound($"Module avec l'ID {id} non trouvé.");
+
+            return Ok(dto);
         }
 
         /// <summary>
-        /// Récupère les modules d'un sprint
+        /// Récupère les modules d’un sprint (Public)
         /// </summary>
         [HttpGet("sprint/{sprintId}")]
-        [AllowAnonymous] // Accessible par tous
-        public async Task<ActionResult<IEnumerable<ModuleDto>>> GetModulesBySprintId(Guid sprintId)
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<ModuleDto>>> GetBySprintId(Guid sprintId)
         {
-            var modules = await _moduleService.GetModulesBySprintIdAsync(sprintId);
-            return Ok(modules);
+            var utilisateurId = GetUserId();
+            var dtos = await _moduleService.GetBySprintIdAsync(sprintId, utilisateurId);
+            return Ok(dtos);
         }
 
         /// <summary>
-        /// Crée un nouveau module
+        /// Crée un nouveau module (Admin)
         /// </summary>
         [HttpPost]
-        [Authorize(Roles = "Admin")] // Seuls les administrateurs peuvent créer
-        public async Task<ActionResult<ModuleDto>> CreateModule([FromBody] CreateModuleDto createModuleDto)
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ModuleDto>> Create([FromBody] CreateModuleDto createDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdModule = await _moduleService.CreateModuleAsync(createModuleDto);
-            return CreatedAtAction(nameof(GetModuleById), new { id = createdModule.Id }, createdModule);
+            try
+            {
+                var created = await _moduleService.CreateAsync(createDto);
+                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erreur serveur lors de la création : {ex.Message}");
+            }
         }
 
         /// <summary>
-        /// Met à jour un module existant
+        /// Met à jour un module (Admin)
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")] // Seuls les administrateurs peuvent modifier
-        public async Task<ActionResult<ModuleDto>> UpdateModule(Guid id, [FromBody] UpdateModuleDto updateModuleDto)
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ModuleDto>> Update(Guid id, [FromBody] UpdateModuleDto updateDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var updatedModule = await _moduleService.UpdateModuleAsync(id, updateModuleDto);
-            if (updatedModule == null)
-                return NotFound($"Module avec l'ID {id} non trouvé");
+            try
+            {
+                var updated = await _moduleService.UpdateAsync(id, updateDto);
+                if (updated == null)
+                    return NotFound($"Module avec l'ID {id} non trouvé.");
 
-            return Ok(updatedModule);
+                return Ok(updated);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erreur serveur lors de la mise à jour : {ex.Message}");
+            }
         }
 
         /// <summary>
-        /// Supprime un module
+        /// Supprime un module (Admin)
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")] // Seuls les administrateurs peuvent supprimer
-        public async Task<ActionResult> DeleteModule(Guid id)
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> Delete(Guid id)
         {
-            var deleted = await _moduleService.DeleteModuleAsync(id);
+            var deleted = await _moduleService.DeleteAsync(id);
             if (!deleted)
-                return NotFound($"Module avec l'ID {id} non trouvé");
+                return NotFound();
 
             return NoContent();
         }

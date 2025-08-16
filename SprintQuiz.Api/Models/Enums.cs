@@ -4,7 +4,8 @@ namespace SprintQuiz.Api.Models
     {
         Cours,
         Module,
-        Sprint
+        Sprint,
+        Formation
     }
 
     public enum NiveauDifficulte

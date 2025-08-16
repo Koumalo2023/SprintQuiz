@@ -15,84 +15,108 @@ namespace SprintQuiz.Api.Controllers
         {
             _coursService = coursService;
         }
+        private Guid? GetUserId()
+        {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            return userIdClaim?.Value != null && Guid.TryParse(userIdClaim.Value, out var userId)
+                ? userId
+                : null;
+        }
 
         /// <summary>
-        /// Récupère tous les cours
+        /// Récupère tous les cours (Public)
         /// </summary>
         [HttpGet]
-        [AllowAnonymous] // Accessible par tous
-        public async Task<ActionResult<IEnumerable<CoursDto>>> GetAllCours()
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<CoursDto>>> GetAll()
         {
-            var cours = await _coursService.GetAllCoursAsync();
+            var cours = await _coursService.GetAllAsync();
             return Ok(cours);
         }
 
         /// <summary>
-        /// Récupère un cours par son ID
+        /// Récupère un cours par ID (Public)
         /// </summary>
         [HttpGet("{id}")]
-        [AllowAnonymous] // Accessible par tous
-        public async Task<ActionResult<CoursDto>> GetCoursById(Guid id)
+        [AllowAnonymous]
+        public async Task<ActionResult<CoursDto>> GetById(Guid id)
         {
-            var cours = await _coursService.GetCoursByIdAsync(id);
-            if (cours == null)
-                return NotFound($"Cours avec l'ID {id} non trouvé");
+            var utilisateurId = GetUserId();
+            var dto = await _coursService.GetByIdAsync(id, utilisateurId);
 
-            return Ok(cours);
+            if (dto == null)
+                return NotFound($"Cours avec l'ID {id} non trouvé.");
+
+            return Ok(dto);
         }
 
         /// <summary>
-        /// Récupère les cours d'un module
+        /// Récupère les cours d’un module (Public)
         /// </summary>
         [HttpGet("module/{moduleId}")]
-        [AllowAnonymous] // Accessible par tous
-        public async Task<ActionResult<IEnumerable<CoursDto>>> GetCoursByModuleId(Guid moduleId)
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<CoursDto>>> GetByModuleId(Guid moduleId)
         {
-            var cours = await _coursService.GetCoursByModuleIdAsync(moduleId);
-            return Ok(cours);
+            var utilisateurId = GetUserId();
+            var dtos = await _coursService.GetByModuleIdAsync(moduleId, utilisateurId);
+            return Ok(dtos);
         }
 
         /// <summary>
-        /// Crée un nouveau cours
+        /// Crée un nouveau cours (Admin)
         /// </summary>
         [HttpPost]
-        [Authorize(Roles = "Admin")] // Seuls les administrateurs peuvent créer
-        public async Task<ActionResult<CoursDto>> CreateCours([FromBody] CreateCoursDto createCoursDto)
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<CoursDto>> Create([FromBody] CreateCoursDto createDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdCours = await _coursService.CreateCoursAsync(createCoursDto);
-            return CreatedAtAction(nameof(GetCoursById), new { id = createdCours.Id }, createdCours);
+            try
+            {
+                var created = await _coursService.CreateAsync(createDto);
+                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erreur serveur lors de la création : {ex.Message}");
+            }
         }
 
         /// <summary>
-        /// Met à jour un cours existant
+        /// Met à jour un cours (Admin)
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")] // Seuls les administrateurs peuvent modifier
-        public async Task<ActionResult<CoursDto>> UpdateCours(Guid id, [FromBody] UpdateCoursDto updateCoursDto)
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<CoursDto>> Update(Guid id, [FromBody] UpdateCoursDto updateDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var updatedCours = await _coursService.UpdateCoursAsync(id, updateCoursDto);
-            if (updatedCours == null)
-                return NotFound($"Cours avec l'ID {id} non trouvé");
+            try
+            {
+                var updated = await _coursService.UpdateAsync(id, updateDto);
+                if (updated == null)
+                    return NotFound($"Cours avec l'ID {id} non trouvé.");
 
-            return Ok(updatedCours);
+                return Ok(updated);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erreur serveur lors de la mise à jour : {ex.Message}");
+            }
         }
 
         /// <summary>
-        /// Supprime un cours
+        /// Supprime un cours (Admin)
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")] // Seuls les administrateurs peuvent supprimer
-        public async Task<ActionResult> DeleteCours(Guid id)
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> Delete(Guid id)
         {
-            var deleted = await _coursService.DeleteCoursAsync(id);
+            var deleted = await _coursService.DeleteAsync(id);
             if (!deleted)
-                return NotFound($"Cours avec l'ID {id} non trouvé");
+                return NotFound();
 
             return NoContent();
         }

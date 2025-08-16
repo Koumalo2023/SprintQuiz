@@ -30,7 +30,7 @@ namespace SprintQuiz.Api.Mappings
                 .ForMember(dest => dest.NiveauNom, opt => opt.MapFrom(src => 
                     src.Niveau == NiveauEnum.Sprint ? src.Sprint!.Nom :
                     src.Niveau == NiveauEnum.Module ? src.Module!.Nom :
-                    src.Cours!.Titre));
+                    src.Cours!.Nom));
 
             CreateMap<StatistiquesGlobales, StatistiquesGlobalesDto>();
 

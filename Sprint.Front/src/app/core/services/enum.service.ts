@@ -23,7 +23,8 @@ export interface EnumConfig {
 export enum NiveauEnum {
   Cours = 0,
   Module = 1,
-  Sprint = 2
+  Sprint = 2,
+  Formation = 3
 }
 
 export enum NiveauDifficulte {
@@ -73,7 +74,8 @@ export class EnumService {
       NiveauEnum: {
         0: { label: 'Cours', color: '#4361ee', icon: 'book', class: 'badge-cours' },
         1: { label: 'Module', color: '#f72585', icon: 'layers', class: 'badge-module' },
-        2: { label: 'Sprint', color: '#4cc9f0', icon: 'calendar', class: 'badge-sprint' }
+        2: { label: 'Sprint', color: '#4cc9f0', icon: 'calendar', class: 'badge-sprint' },
+        3: { label: 'Formation', color: '#fd7e14', icon: 'calendar', class: 'badge-formation' }
       },
       NiveauDifficulte: {
         0: { label: 'Facile', color: '#22b24c', icon: 'star-half', class: 'badge-success' },
