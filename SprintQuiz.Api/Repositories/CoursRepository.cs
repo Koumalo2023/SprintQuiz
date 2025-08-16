@@ -42,13 +42,18 @@ namespace SprintQuiz.Api.Repositories
 
         public async Task<Cours> CreateAsync(Cours cours)
         {
+            cours.Id = cours.Id == Guid.Empty ? Guid.NewGuid() : cours.Id;
+            cours.DateCreation = DateTime.UtcNow;
+
             _context.Cours.Add(cours);
             await _context.SaveChangesAsync();
             return cours;
         }
 
+
         public async Task<Cours> UpdateAsync(Cours cours)
         {
+            cours.DerniereModification = DateTime.UtcNow;
             _context.Cours.Update(cours);
             await _context.SaveChangesAsync();
             return cours;
@@ -58,6 +63,15 @@ namespace SprintQuiz.Api.Repositories
         {
             var cours = await _context.Cours.FindAsync(id);
             if (cours == null) return false;
+
+            // Suppression en cascade des contenus polymorphes liés
+            var quizToDelete = _context.Quizzes.Where(q => q.Niveau == NiveauEnum.Cours && q.NiveauId == id);
+            var qaQuestionsToDelete = _context.QAQuestions.Where(q => q.Niveau == NiveauEnum.Cours && q.NiveauId == id);
+            var exercicesToDelete = _context.Exercices.Where(e => e.Niveau == NiveauEnum.Cours && e.NiveauId == id);
+
+            _context.Quizzes.RemoveRange(quizToDelete);
+            _context.QAQuestions.RemoveRange(qaQuestionsToDelete);
+            _context.Exercices.RemoveRange(exercicesToDelete);
 
             _context.Cours.Remove(cours);
             await _context.SaveChangesAsync();
