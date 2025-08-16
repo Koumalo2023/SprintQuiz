@@ -4,12 +4,13 @@ namespace SprintQuiz.Api.Services
 {
     public interface ISprintService
     {
-        Task<IEnumerable<SprintDto>> GetAllSprintsAsync();
-        Task<SprintDto?> GetSprintByIdAsync(Guid id);
-        Task<SprintDto?> GetSprintWithModulesAsync(Guid id);
-        Task<SprintDto> CreateSprintAsync(CreateSprintDto createSprintDto);
-        Task<SprintDto?> UpdateSprintAsync(Guid id, UpdateSprintDto updateSprintDto);
-        Task<bool> DeleteSprintAsync(Guid id);
+        Task<IEnumerable<SprintDto>> GetAllAsync();
+        Task<SprintDto?> GetByIdAsync(Guid id, Guid? utilisateurId = null);
+        Task<SprintDto?> GetWithModulesAsync(Guid id, Guid? utilisateurId = null);
+        Task<SprintDto> CreateAsync(CreateSprintDto createDto);
+        Task<SprintDto?> UpdateAsync(Guid id, UpdateSprintDto updateDto);
+        Task<bool> DeleteAsync(Guid id);
+        Task<bool> ExistsAsync(Guid id);
     }
 }
 

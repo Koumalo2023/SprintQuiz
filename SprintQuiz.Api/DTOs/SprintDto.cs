@@ -24,7 +24,8 @@ namespace SprintQuiz.Api.DTOs
         public DateTime DateCreation { get; set; }
         public DateTime? DerniereModification { get; set; }
         public DateTime? DerniereActivite { get; set; } // Calculé dynamiquement
-
+        public Guid FormationId { get; set; }
+        public string? FormationNom { get; set; }
         public List<ModuleDto>? Modules { get; set; }
     }
 
@@ -42,6 +43,7 @@ namespace SprintQuiz.Api.DTOs
         public string? Objectifs { get; set; }
         public string? Resume { get; set; }
         public string? NotionsCles { get; set; }
+        public Guid FormationId { get; set; }
         public List<string> Tags { get; set; } = new();
     }
 
@@ -56,6 +58,7 @@ namespace SprintQuiz.Api.DTOs
         public string? Objectifs { get; set; }
         public string? Resume { get; set; }
         public string? NotionsCles { get; set; }
+        public Guid FormationId { get; set; }
         public List<string>? Tags { get; set; }
     }
 }
