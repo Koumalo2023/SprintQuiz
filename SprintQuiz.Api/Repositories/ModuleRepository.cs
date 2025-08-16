@@ -32,8 +32,10 @@ namespace SprintQuiz.Api.Repositories
         public async Task<Module?> GetByIdWithCoursAsync(Guid id)
         {
             return await _context.Modules
-                .Include(m => m.Sprint)
-                .Include(m => m.Cours.OrderBy(c => c.Ordre))
+                .Include(m => m.Cours)
+                .Include(m => m.Quizzes)
+                .Include(m => m.QAQuestions)
+                .Include(m => m.Exercices)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
 
@@ -48,6 +50,9 @@ namespace SprintQuiz.Api.Repositories
 
         public async Task<Module> CreateAsync(Module module)
         {
+            module.Id = module.Id == Guid.Empty ? Guid.NewGuid() : module.Id;
+            module.DateCreation = DateTime.UtcNow;
+
             _context.Modules.Add(module);
             await _context.SaveChangesAsync();
             return module;
@@ -55,6 +60,7 @@ namespace SprintQuiz.Api.Repositories
 
         public async Task<Module> UpdateAsync(Module module)
         {
+            module.DerniereModification = DateTime.UtcNow;
             _context.Modules.Update(module);
             await _context.SaveChangesAsync();
             return module;
@@ -65,6 +71,15 @@ namespace SprintQuiz.Api.Repositories
             var module = await _context.Modules.FindAsync(id);
             if (module == null) return false;
 
+            // Suppression en cascade des contenus polymorphes liés
+            var quizToDelete = _context.Quizzes.Where(q => q.Niveau == NiveauEnum.Module && q.NiveauId == id);
+            var qaQuestionsToDelete = _context.QAQuestions.Where(q => q.Niveau == NiveauEnum.Module && q.NiveauId == id);
+            var exercicesToDelete = _context.Exercices.Where(e => e.Niveau == NiveauEnum.Module && e.NiveauId == id);
+
+            _context.Quizzes.RemoveRange(quizToDelete);
+            _context.QAQuestions.RemoveRange(qaQuestionsToDelete);
+            _context.Exercices.RemoveRange(exercicesToDelete);
+
             _context.Modules.Remove(module);
             await _context.SaveChangesAsync();
             return true;
@@ -74,6 +89,8 @@ namespace SprintQuiz.Api.Repositories
         {
             return await _context.Modules.AnyAsync(m => m.Id == id);
         }
+
+         
     }
 }
 
