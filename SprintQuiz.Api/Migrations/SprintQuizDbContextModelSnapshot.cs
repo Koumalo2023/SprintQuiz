@@ -103,20 +103,75 @@ namespace SprintQuiz.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("DateCreation")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DateOuverture")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DerniereModification")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasMaxLength(3000)
+                        .HasColumnType("character varying(3000)");
+
+                    b.Property<int>("DifficulteMoyenne")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
+                    b.Property<int>("DureeEstimee")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<bool>("EstActif")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<Guid>("ModuleId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Ordre")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Titre")
+                    b.Property<string>("Nom")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<int>("NombreExercices")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("NombreFlashcards")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("NombreQuiz")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("NotionsCles")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Objectifs")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("Ordre")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Resume")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Tags")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -211,6 +266,87 @@ namespace SprintQuiz.Api.Migrations
                     b.ToTable("Exercices");
                 });
 
+            modelBuilder.Entity("SprintQuiz.Api.Models.Formation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("DateCreation")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DateOuverture")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DerniereModification")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(3000)
+                        .HasColumnType("character varying(3000)");
+
+                    b.Property<int>("DifficulteMoyenne")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
+                    b.Property<int>("DureeEstimee")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<bool>("EstActif")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Nom")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("NombreExercices")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("NombreFlashcards")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("NombreQuiz")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("NotionsCles")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Objectifs")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("Ordre")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Resume")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Tags")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Ordre")
+                        .IsUnique();
+
+                    b.ToTable("Formations");
+                });
+
             modelBuilder.Entity("SprintQuiz.Api.Models.Indice", b =>
                 {
                     b.Property<Guid>("Id")
@@ -241,20 +377,75 @@ namespace SprintQuiz.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("DateCreation")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DateOuverture")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DerniereModification")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasMaxLength(3000)
+                        .HasColumnType("character varying(3000)");
+
+                    b.Property<int>("DifficulteMoyenne")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
+                    b.Property<int>("DureeEstimee")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<bool>("EstActif")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Nom")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<int>("NombreExercices")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("NombreFlashcards")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("NombreQuiz")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("NotionsCles")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Objectifs")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
                     b.Property<int>("Ordre")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Resume")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
                     b.Property<Guid>("SprintId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Tags")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -275,6 +466,9 @@ namespace SprintQuiz.Api.Migrations
 
                     b.Property<DateTime>("DerniereActivite")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("FormationId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("ModuleId")
                         .HasColumnType("uuid");
@@ -298,6 +492,8 @@ namespace SprintQuiz.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CoursId");
+
+                    b.HasIndex("FormationId");
 
                     b.HasIndex("ModuleId");
 
@@ -505,19 +701,79 @@ namespace SprintQuiz.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("DateCreation")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DateOuverture")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DerniereModification")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasMaxLength(3000)
+                        .HasColumnType("character varying(3000)");
+
+                    b.Property<int>("DifficulteMoyenne")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
+                    b.Property<int>("DureeEstimee")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<bool>("EstActif")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<Guid>("FormationId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Nom")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<int>("NombreExercices")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("NombreFlashcards")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("NombreQuiz")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("NotionsCles")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Objectifs")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
                     b.Property<int>("Ordre")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Resume")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Tags")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("FormationId");
 
                     b.HasIndex("Ordre")
                         .IsUnique();
@@ -734,6 +990,10 @@ namespace SprintQuiz.Api.Migrations
                         .WithMany("Progressions")
                         .HasForeignKey("CoursId");
 
+                    b.HasOne("SprintQuiz.Api.Models.Formation", null)
+                        .WithMany("Progressions")
+                        .HasForeignKey("FormationId");
+
                     b.HasOne("SprintQuiz.Api.Models.Module", "Module")
                         .WithMany("Progressions")
                         .HasForeignKey("ModuleId");
@@ -848,6 +1108,17 @@ namespace SprintQuiz.Api.Migrations
                     b.Navigation("Tentative");
                 });
 
+            modelBuilder.Entity("SprintQuiz.Api.Models.Sprint", b =>
+                {
+                    b.HasOne("SprintQuiz.Api.Models.Formation", "Formation")
+                        .WithMany("Sprints")
+                        .HasForeignKey("FormationId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.Navigation("Formation");
+                });
+
             modelBuilder.Entity("SprintQuiz.Api.Models.StatistiquesGlobales", b =>
                 {
                     b.HasOne("SprintQuiz.Api.Models.Utilisateur", "Utilisateur")
@@ -896,6 +1167,13 @@ namespace SprintQuiz.Api.Migrations
                     b.Navigation("EtapesResolution");
 
                     b.Navigation("Indices");
+                });
+
+            modelBuilder.Entity("SprintQuiz.Api.Models.Formation", b =>
+                {
+                    b.Navigation("Progressions");
+
+                    b.Navigation("Sprints");
                 });
 
             modelBuilder.Entity("SprintQuiz.Api.Models.Module", b =>
