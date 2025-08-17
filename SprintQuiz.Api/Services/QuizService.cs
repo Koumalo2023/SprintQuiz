@@ -2,13 +2,11 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SprintQuiz.Api.Data;
 using SprintQuiz.Api.DTOs;
-using SprintQuiz.Api.Exceptions;
-using SprintQuiz.Api.Middleware;
 using SprintQuiz.Api.Models;
 using SprintQuiz.Api.Repositories;
-using System.Data;
+using SprintQuiz.Api.Services;
 
-namespace SprintQuiz.Api.Services
+namespace SprintQuiz.Services
 {
     public class QuizService : IQuizService
     {
@@ -35,10 +33,49 @@ namespace SprintQuiz.Api.Services
             return quiz == null ? null : _mapper.Map<QuizDto>(quiz);
         }
 
-        public async Task<QuizDto?> GetQuizWithQuestionsAsync(Guid id)
+        public async Task<QuizDto?> GetQuizWithQuestionsAsync(Guid id, Guid? utilisateurId = null, bool revision = true)
         {
-            var quiz = await _quizRepository.GetByIdWithQuestionsAsync(id);
-            return quiz == null ? null : _mapper.Map<QuizDto>(quiz);
+            var quiz = await _context.Quizzes
+                .Include(q => q.Questions)
+                    .ThenInclude(q => q.Options)
+                .FirstOrDefaultAsync(q => q.Id == id);
+            if (quiz == null) return null;
+
+            var dto = _mapper.Map<QuizDto>(quiz);
+
+            // Ajouter la dernière activité utilisateur
+            if (utilisateurId.HasValue)
+            {
+                var progression = await _context.ProgressionsUtilisateur
+                    .FirstOrDefaultAsync(p => p.UtilisateurId == utilisateurId.Value
+                                           && p.Niveau == NiveauEnum.Quiz
+                                           && p.NiveauId == id);
+                dto.DerniereActivite = progression?.DerniereActivite;
+
+                // Si mode révision, filtrer les questions ratées
+               
+            }
+
+            // Calculer les statistiques utilisateur
+            var tentatives = await _context.TentativesQuiz
+                .Where(t => t.QuizId == id && t.UtilisateurId == utilisateurId.Value)
+                .OrderByDescending(t => t.Date)
+                .ToListAsync();
+
+            dto.NombreTentatives = tentatives.Count;
+            dto.DernierScore = tentatives.FirstOrDefault()?.Score;
+            dto.MeilleurScore = tentatives.Any() ? tentatives.Max(t => t.Score) : (float?)null;
+
+            dto.Feedback = dto.MeilleurScore switch
+            {
+                >= 0.9f => "Excellent ! Tu maîtrises parfaitement ce sujet.",
+                >= 0.7f => "Bon travail ! Continue comme ça.",
+                >= 0.5f => "Tu progresses, mais reste concentré.",
+                > 0 => "Continue à t’entraîner, tu vas y arriver !",
+                _ => string.Empty
+            };
+
+            return dto;
         }
 
         public async Task<IEnumerable<QuizDto>> GetQuizzesByNiveauAsync(NiveauEnum niveau, Guid niveauId)
@@ -56,12 +93,11 @@ namespace SprintQuiz.Api.Services
 
             try
             {
-                // Valider les questions avant toute opération
+                // Valider les questions
                 foreach (var questionDto in createQuizDto.Questions)
                 {
                     if (!questionDto.Options.Any())
                         throw new ArgumentException($"La question '{questionDto.Intitule}' doit avoir au moins une option.");
-
                     if (!questionDto.Options.Any(o => o.EstCorrecte))
                         throw new ArgumentException($"La question '{questionDto.Intitule}' doit avoir au moins une bonne réponse.");
                 }
@@ -71,7 +107,7 @@ namespace SprintQuiz.Api.Services
                 quiz.Id = Guid.NewGuid();
                 quiz.DateCreation = DateTime.UtcNow;
 
-                // Préparer les questions avec leurs options
+                // Préparer les questions
                 var questions = createQuizDto.Questions.Select(questionDto =>
                 {
                     var question = _mapper.Map<QCMQuestion>(questionDto);
@@ -89,19 +125,22 @@ namespace SprintQuiz.Api.Services
                     return question;
                 }).ToList();
 
-                // Ajouter tout en une seule opération
                 quiz.Questions = questions;
                 _context.Quizzes.Add(quiz);
 
-                // Un seul appel à SaveChanges
+                // Calculer la durée estimée
+                quiz.DureeEstimee = CalculateEstimatedTimeForQuiz(quiz);
+
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                // Recharger le quiz avec les relations pour le retour
+                // Recharger pour retour
                 var createdQuiz = await _context.Quizzes
-                    .Include(q => q.Questions)
-                        .ThenInclude(q => q.Options)
+                    .Include(q => q.Questions).ThenInclude(q => q.Options)
                     .FirstOrDefaultAsync(q => q.Id == quiz.Id);
+
+                // Créer la progression initiale
+                await CreateInitialProgressionForQuiz(createdQuiz.Id);
 
                 return _mapper.Map<QuizDto>(createdQuiz);
             }
@@ -112,21 +151,18 @@ namespace SprintQuiz.Api.Services
             }
         }
 
-
         public async Task<QuizDto?> UpdateQuizAsync(Guid id, UpdateQuizDto updateQuizDto)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
-                //  Charger le quiz sans le suivre (pour éviter le suivi d'état)
                 var quiz = await _context.Quizzes
                     .AsNoTracking()
                     .FirstOrDefaultAsync(q => q.Id == id);
 
                 if (quiz == null) return null;
 
-                //  Validation du DTO
                 if (!updateQuizDto.Questions?.Any() ?? true)
                     throw new ArgumentException("Un quiz doit avoir au moins une question.");
 
@@ -136,10 +172,12 @@ namespace SprintQuiz.Api.Services
                     if (!q.Options.Any(o => o.EstCorrecte)) throw new ArgumentException($"La question '{q.Intitule}' doit avoir une bonne réponse.");
                 }
 
-                //  Supprimer les anciennes questions
-                _context.QCMQuestions.RemoveRange(_context.QCMQuestions.Where(q => q.QuizId == id));
+                // Supprimer les anciennes questions
+                await _context.QCMQuestions
+                    .Where(q => q.QuizId == id)
+                    .ExecuteDeleteAsync();
 
-                // ➕ Créer les nouvelles
+                // Créer les nouvelles
                 var nouvellesQuestions = new List<QCMQuestion>();
                 foreach (var questionDto in updateQuizDto.Questions)
                 {
@@ -160,11 +198,18 @@ namespace SprintQuiz.Api.Services
 
                 _context.QCMQuestions.AddRange(nouvellesQuestions);
 
-                //  Sauvegarder → si Version a changé, échec (concurrent update)
+                // Récupérer le quiz pour mise à jour
+                var quizToUpdate = await _context.Quizzes.FindAsync(id);
+                if (quizToUpdate != null)
+                {
+                    _mapper.Map(updateQuizDto, quizToUpdate);
+                    quizToUpdate.DerniereModification = DateTime.UtcNow;
+                    quizToUpdate.DureeEstimee = CalculateEstimatedTimeForQuiz(nouvellesQuestions); // ✅
+                }
+
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                //  Recharger pour retourner
                 var updatedQuiz = await _context.Quizzes
                     .Include(q => q.Questions).ThenInclude(q => q.Options)
                     .FirstOrDefaultAsync(q => q.Id == id);
@@ -186,22 +231,18 @@ namespace SprintQuiz.Api.Services
             }
         }
 
-
         public async Task<bool> DeleteQuizAsync(Guid id)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
-                // 1. Vérifier l'existence du quiz sans le tracker
                 var quizExists = await _context.Quizzes
                     .AsNoTracking()
                     .AnyAsync(q => q.Id == id);
 
                 if (!quizExists) return false;
 
-                // 2. Suppression en cascade optimisée (EF Core 7+)
-                // D'abord les options
                 await _context.QCMOptions
                     .Where(o => _context.QCMQuestions
                         .Where(q => q.QuizId == id)
@@ -209,24 +250,20 @@ namespace SprintQuiz.Api.Services
                         .Contains(o.QuestionId))
                     .ExecuteDeleteAsync();
 
-                // Ensuite les questions
                 await _context.QCMQuestions
                     .Where(q => q.QuizId == id)
                     .ExecuteDeleteAsync();
 
-                // Puis les tentatives
                 await _context.TentativesQuiz
                     .Where(t => t.QuizId == id)
                     .ExecuteDeleteAsync();
 
-                // Enfin le quiz lui-même
                 var rowsAffected = await _context.Quizzes
                     .Where(q => q.Id == id)
                     .ExecuteDeleteAsync();
 
                 await transaction.CommitAsync();
 
-                // Si aucune ligne affectée, le quiz a été supprimé entre-temps
                 return rowsAffected > 0;
             }
             catch (Exception ex)
@@ -258,7 +295,7 @@ namespace SprintQuiz.Api.Services
             {
                 var question = quiz.Questions.FirstOrDefault(q => q.Id == reponseDto.QuestionId);
                 var option = question?.Options.FirstOrDefault(o => o.Id == reponseDto.OptionId);
-                
+
                 if (question != null && option != null)
                 {
                     var reponse = new ReponseUtilisateurQCM
@@ -287,11 +324,14 @@ namespace SprintQuiz.Api.Services
             }
 
             tentative.Score = quiz.Questions.Count > 0 ? (float)correctAnswers / quiz.Questions.Count : 0;
-            tentative.Reussi = tentative.Score >= 0.5f; // 50% pour réussir
+            tentative.Reussi = tentative.Score >= 0.5f;
 
             _context.TentativesQuiz.Add(tentative);
             _context.ReponsesUtilisateurQCM.AddRange(reponses);
             await _context.SaveChangesAsync();
+
+            // Mettre à jour la progression utilisateur
+            await UpdateUserProgressionAfterQuizSubmission(utilisateurId, quiz.Id, tentative.Score);
 
             return new QuizResultDto
             {
@@ -304,8 +344,6 @@ namespace SprintQuiz.Api.Services
                 Reponses = reponsesDto
             };
         }
-
-        
 
         public async Task<IEnumerable<TentativeQuizDto>> GetUserQuizAttemptsAsync(Guid utilisateurId)
         {
@@ -352,14 +390,13 @@ namespace SprintQuiz.Api.Services
             return await _quizRepository.DeleteQuestionAsync(id);
         }
 
+        // --- Options ---
         public async Task<QCMOptionDto?> GetOptionByIdAsync(Guid id)
         {
             var option = await _quizRepository.GetOptionByIdAsync(id);
-            if (option == null) return null;
-            return _mapper.Map<QCMOptionDto>(option);
+            return option == null ? null : _mapper.Map<QCMOptionDto>(option);
         }
 
-        // --- Options ---
         public async Task<IEnumerable<QCMOptionDto>> GetOptionsByQuestionIdAsync(Guid questionId)
         {
             var options = await _quizRepository.GetOptionsByQuestionIdAsync(questionId);
@@ -386,6 +423,65 @@ namespace SprintQuiz.Api.Services
         {
             return await _quizRepository.DeleteOptionAsync(id);
         }
+
+        // --- Méthodes privées ---
+
+        private int CalculateEstimatedTimeForQuiz(Quiz? quiz)
+        {
+            var questions = quiz?.Questions ?? Enumerable.Empty<QCMQuestion>();
+            return CalculateEstimatedTimeForQuiz(questions);
+        }
+
+        private int CalculateEstimatedTimeForQuiz(IEnumerable<QCMQuestion> questions)
+        {
+            int totalSeconds = questions.Count() * 90;
+            return (int)Math.Ceiling(totalSeconds / 60.0);
+        }
+
+        private async Task CreateInitialProgressionForQuiz(Guid quizId)
+        {
+            var progression = new ProgressionUtilisateur
+            {
+                Id = Guid.NewGuid(),
+                Niveau = NiveauEnum.Quiz,
+                NiveauId = quizId,
+                PourcentageComplet = 0,
+                DerniereActivite = DateTime.UtcNow,
+                DateCreation = DateTime.UtcNow
+            };
+
+            _context.ProgressionsUtilisateur.Add(progression);
+            // Ne pas appeler SaveChanges ici → inclus dans la transaction
+        }
+
+        private async Task UpdateUserProgressionAfterQuizSubmission(Guid utilisateurId, Guid quizId, float score)
+        {
+            var progression = await _context.ProgressionsUtilisateur
+                .FirstOrDefaultAsync(p => p.UtilisateurId == utilisateurId
+                                       && p.Niveau == NiveauEnum.Quiz
+                                       && p.NiveauId == quizId);
+
+            if (progression != null)
+            {
+                progression.DerniereActivite = DateTime.UtcNow;
+                progression.PourcentageComplet = score * 100; // Approximation
+            }
+            else
+            {
+                var newProgression = new ProgressionUtilisateur
+                {
+                    Id = Guid.NewGuid(),
+                    UtilisateurId = utilisateurId,
+                    Niveau = NiveauEnum.Quiz,
+                    NiveauId = quizId,
+                    PourcentageComplet = score * 100,
+                    DerniereActivite = DateTime.UtcNow,
+                    DateCreation = DateTime.UtcNow
+                };
+                _context.ProgressionsUtilisateur.Add(newProgression);
+            }
+
+            await _context.SaveChangesAsync();
+        }
     }
 }
-

@@ -18,6 +18,8 @@ namespace SprintQuiz.Api.Models
 
         [Required]
         public bool EstCorrecte { get; set; }
+        [MaxLength(1000)]
+        public string? Explication { get; set; }
 
         // Navigation properties
         public virtual QCMQuestion Question { get; set; } = null!;

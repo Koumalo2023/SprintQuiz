@@ -1,11 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SprintQuiz.Api.DTOs;
 using SprintQuiz.Api.Models;
-using SprintQuiz.Api.Services;
-using Microsoft.AspNetCore.Authorization;
+using SprintQuiz.Api.Services; 
 using System.Security.Claims;
 
-namespace SprintQuiz.Api.Controllers
+namespace SprintQuiz.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -18,21 +18,19 @@ namespace SprintQuiz.Api.Controllers
             _quizService = quizService;
         }
 
-        private Guid GetUserId()
+        private Guid? GetUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-            {
-                throw new UnauthorizedAccessException("ID utilisateur non trouvé ou invalide dans le token.");
-            }
-            return userId;
+            return userIdClaim?.Value != null && Guid.TryParse(userIdClaim.Value, out var userId)
+                ? userId
+                : null;
         }
 
         /// <summary>
-        /// Récupère tous les quiz
+        /// Récupère tous les quiz (Public)
         /// </summary>
         [HttpGet]
-        [AllowAnonymous] // Accessible par tous
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<QuizDto>>> GetAllQuizzes()
         {
             var quizzes = await _quizService.GetAllQuizzesAsync();
@@ -40,39 +38,60 @@ namespace SprintQuiz.Api.Controllers
         }
 
         /// <summary>
-        /// Récupère un quiz par son ID
+        /// Récupère un quiz par ID (Public)
         /// </summary>
         [HttpGet("{id}")]
-        [AllowAnonymous] // Accessible par tous
+        [AllowAnonymous]
         public async Task<ActionResult<QuizDto>> GetQuizById(Guid id)
         {
             var quiz = await _quizService.GetQuizByIdAsync(id);
             if (quiz == null)
-                return NotFound($"Quiz avec l'ID {id} non trouvé");
-
+                return NotFound($"Quiz avec l'ID {id} non trouvé.");
             return Ok(quiz);
         }
 
         /// <summary>
-        /// Récupère un quiz avec ses questions
+        /// Récupère un quiz avec ses questions (Authentifié)
+        /// Optionnel : ?revision=true pour le mode révision
         /// </summary>
         [HttpGet("{id}/questions")]
-        [Authorize] // Nécessite une authentification pour voir les questions
-        public async Task<ActionResult<QuizDto>> GetQuizWithQuestions(Guid id)
+        [Authorize]
+        public async Task<ActionResult<QuizDto>> GetQuizWithQuestions(Guid id, [FromQuery] bool revision = false)
         {
-            var quiz = await _quizService.GetQuizWithQuestionsAsync(id);
-            if (quiz == null)
-                return NotFound($"Quiz avec l'ID {id} non trouvé");
+            var utilisateurId = GetUserId();
+            var dto = await _quizService.GetQuizWithQuestionsAsync(id, utilisateurId);
 
-            return Ok(quiz);
+            if (dto == null)
+                return NotFound($"Quiz avec l'ID {id} non trouvé.");
+
+            // Mode révision : filtrer les questions non maîtrisées
+            if (revision && utilisateurId.HasValue)
+            {
+                var tentatives = await _quizService.GetUserQuizAttemptsAsync(utilisateurId.Value);
+                var questionsRatees = tentatives
+                    .SelectMany(t => t.Reponses)
+                    .Where(r => !r.EstCorrecte)
+                    .Select(r => r.QuestionId)
+                    .Distinct();
+
+                dto.Questions = dto.Questions.Where(q => questionsRatees.Contains(q.Id)).ToList();
+            }
+
+            // Mélanger les questions si activé
+            if (dto.MelangerQuestions)
+            {
+                var random = new Random();
+                dto.Questions = dto.Questions.OrderBy(q => random.Next()).ToList();
+            }
+
+            return Ok(dto);
         }
 
-        
         /// <summary>
-        /// Récupère les quiz par niveau (cours, module, sprint)
+        /// Récupère les quiz par niveau (cours, module, sprint) (Public)
         /// </summary>
         [HttpGet("niveau/{niveau}/{niveauId}")]
-        [AllowAnonymous] // Accessible par tous
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<QuizDto>>> GetQuizzesByNiveau(NiveauEnum niveau, Guid niveauId)
         {
             var quizzes = await _quizService.GetQuizzesByNiveauAsync(niveau, niveauId);
@@ -80,7 +99,7 @@ namespace SprintQuiz.Api.Controllers
         }
 
         /// <summary>
-        /// Crée un nouveau quiz avec ses questions 
+        /// Crée un nouveau quiz (Admin)
         /// </summary>
         [HttpPost]
         [Authorize(Roles = "Admin")]
@@ -100,10 +119,8 @@ namespace SprintQuiz.Api.Controllers
             }
         }
 
-
-
         /// <summary>
-        /// Met à jour un quiz existant
+        /// Met à jour un quiz (Admin)
         /// </summary>
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
@@ -116,7 +133,7 @@ namespace SprintQuiz.Api.Controllers
             {
                 var updatedQuiz = await _quizService.UpdateQuizAsync(id, updateQuizDto);
                 if (updatedQuiz == null)
-                    return NotFound($"Quiz avec l'ID {id} non trouvé");
+                    return NotFound($"Quiz avec l'ID {id} non trouvé.");
                 return Ok(updatedQuiz);
             }
             catch (ArgumentException ex)
@@ -130,23 +147,100 @@ namespace SprintQuiz.Api.Controllers
         }
 
         /// <summary>
-        /// Supprime un quiz
+        /// Supprime un quiz (Admin)
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")] // Seuls les administrateurs peuvent supprimer des quiz
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteQuiz(Guid id)
         {
             var deleted = await _quizService.DeleteQuizAsync(id);
             if (!deleted)
-                return NotFound($"Quiz avec l'ID {id} non trouvé");
-
+                return NotFound();
             return NoContent();
         }
 
         /// <summary>
-        /// Récupère toutes les questions d'un quiz
+        /// Soumet une tentative de quiz (Authentifié)
         /// </summary>
-        [HttpGet("quiz/{quizId}/questions")]
+        [HttpPost("submit")]
+        [Authorize]
+        public async Task<ActionResult<QuizResultDto>> SubmitQuiz([FromBody] CreateTentativeQuizDto tentativeDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var utilisateurId = GetUserId();
+                if (!utilisateurId.HasValue)
+                    return Unauthorized("Utilisateur non authentifié.");
+
+                var result = await _quizService.SubmitQuizAsync(utilisateurId.Value, tentativeDto);
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Récupère les tentatives de quiz de l'utilisateur connecté (Authentifié)
+        /// </summary>
+        [HttpGet("mes-tentatives")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<TentativeQuizDto>>> GetMyQuizAttempts()
+        {
+            try
+            {
+                var utilisateurId = GetUserId();
+                if (!utilisateurId.HasValue)
+                    return Unauthorized("Utilisateur non authentifié.");
+
+                var tentatives = await _quizService.GetUserQuizAttemptsAsync(utilisateurId.Value);
+                return Ok(tentatives);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Erreur lors de la récupération de vos tentatives.");
+            }
+        }
+
+        /// <summary>
+        /// Récupère les tentatives d'un utilisateur (Admin ou soi-même)
+        /// </summary>
+        [HttpGet("utilisateur/{utilisateurId}/tentatives")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<TentativeQuizDto>>> GetUserQuizAttempts(Guid utilisateurId)
+        {
+            try
+            {
+                var currentUserId = GetUserId();
+                var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+                if (!currentUserId.HasValue)
+                    return Unauthorized("Utilisateur non authentifié.");
+
+                if (currentUserId.Value != utilisateurId && userRole != "Admin")
+                    return Forbid("Vous ne pouvez consulter que vos propres tentatives.");
+
+                var tentatives = await _quizService.GetUserQuizAttemptsAsync(utilisateurId);
+                return Ok(tentatives);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Erreur lors de la récupération des tentatives.");
+            }
+        }
+
+        // -----------------------------
+        // Gestion des Questions & Options (Admin uniquement)
+        // -----------------------------
+
+        /// <summary>
+        /// Récupère les questions d'un quiz (Authentifié)
+        /// </summary>
+        [HttpGet("questions/quiz/{quizId}")]
         [Authorize]
         public async Task<ActionResult<IEnumerable<QCMQuestionDto>>> GetQuestionsByQuiz(Guid quizId)
         {
@@ -155,7 +249,7 @@ namespace SprintQuiz.Api.Controllers
         }
 
         /// <summary>
-        /// Récupère une question par ID
+        /// Récupère une question par ID (Authentifié)
         /// </summary>
         [HttpGet("question/{id}")]
         [Authorize]
@@ -167,9 +261,8 @@ namespace SprintQuiz.Api.Controllers
             return Ok(question);
         }
 
-
         /// <summary>
-        /// Met à jour une question
+        /// Met à jour une question (Admin)
         /// </summary>
         [HttpPut("question/{id}")]
         [Authorize(Roles = "Admin")]
@@ -185,7 +278,7 @@ namespace SprintQuiz.Api.Controllers
         }
 
         /// <summary>
-        /// Supprime une question
+        /// Supprime une question (Admin)
         /// </summary>
         [HttpDelete("question/{id}")]
         [Authorize(Roles = "Admin")]
@@ -197,10 +290,8 @@ namespace SprintQuiz.Api.Controllers
             return NoContent();
         }
 
-        // --- Options ---
-
         /// <summary>
-        /// Récupère les options d'une question
+        /// Récupère les options d'une question (Authentifié)
         /// </summary>
         [HttpGet("question/{questionId}/options")]
         [Authorize]
@@ -211,7 +302,7 @@ namespace SprintQuiz.Api.Controllers
         }
 
         /// <summary>
-        /// Crée une option de réponse
+        /// Crée une option de réponse (Admin)
         /// </summary>
         [HttpPost("option")]
         [Authorize(Roles = "Admin")]
@@ -225,7 +316,7 @@ namespace SprintQuiz.Api.Controllers
         }
 
         /// <summary>
-        /// Met à jour une option
+        /// Met à jour une option (Admin)
         /// </summary>
         [HttpPut("option/{id}")]
         [Authorize(Roles = "Admin")]
@@ -241,7 +332,7 @@ namespace SprintQuiz.Api.Controllers
         }
 
         /// <summary>
-        /// Supprime une option
+        /// Supprime une option (Admin)
         /// </summary>
         [HttpDelete("option/{id}")]
         [Authorize(Roles = "Admin")]
@@ -253,7 +344,9 @@ namespace SprintQuiz.Api.Controllers
             return NoContent();
         }
 
-        // Ajouter une méthode utilitaire si besoin
+        /// <summary>
+        /// Récupère une option par ID (Authentifié)
+        /// </summary>
         [HttpGet("option/{id}")]
         [Authorize]
         public async Task<ActionResult<QCMOptionDto>> GetOptionById(Guid id)
@@ -263,71 +356,5 @@ namespace SprintQuiz.Api.Controllers
                 return NotFound($"Option avec l'ID {id} non trouvée.");
             return Ok(option);
         }
-
-        /// <summary>
-        /// Soumet une tentative de quiz
-        /// </summary>
-        [HttpPost("submit")]
-        [Authorize] // Nécessite une authentification pour soumettre un quiz
-        public async Task<ActionResult<QuizResultDto>> SubmitQuiz([FromBody] CreateTentativeQuizDto tentativeDto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            try
-            {
-                var utilisateurId = GetUserId();
-                var result = await _quizService.SubmitQuizAsync(utilisateurId, tentativeDto);
-                return Ok(result);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Récupère les tentatives de quiz d'un utilisateur
-        /// </summary>
-        [HttpGet("utilisateur/{utilisateurId}/tentatives")]
-        [Authorize] // Nécessite une authentification
-        public async Task<ActionResult<IEnumerable<TentativeQuizDto>>> GetUserQuizAttempts(Guid utilisateurId)
-        {
-            // Vérifier que l'utilisateur demande ses propres tentatives ou qu'il est admin
-            var currentUserId = GetUserId();
-            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-
-            if (currentUserId != utilisateurId && userRole != "Admin")
-            {
-                return Forbid("Vous ne pouvez consulter que vos propres tentatives.");
-            }
-
-            var tentatives = await _quizService.GetUserQuizAttemptsAsync(utilisateurId);
-            return Ok(tentatives);
-        }
-
-        /// <summary>
-        /// Récupère les tentatives de quiz de l'utilisateur connecté
-        /// </summary>
-        [HttpGet("mes-tentatives")]
-        [Authorize] // Nécessite une authentification
-        public async Task<ActionResult<IEnumerable<TentativeQuizDto>>> GetMyQuizAttempts()
-        {
-            try
-            {
-                var utilisateurId = GetUserId();
-                var tentatives = await _quizService.GetUserQuizAttemptsAsync(utilisateurId);
-                return Ok(tentatives);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(ex.Message);
-            }
-        }
     }
 }
-

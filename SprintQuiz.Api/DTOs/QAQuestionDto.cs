@@ -11,7 +11,12 @@ namespace SprintQuiz.Api.DTOs
         public Guid NiveauId { get; set; }
         public NiveauDifficulte NiveauDifficulte { get; set; }
         public List<string>? Tags { get; set; }
-        public DateTime DateCreation { get; set; }
+        public DateTime DateCreation { get; set; } 
+        public DateTime? DerniereModification { get; set; }
+
+        public int DureeEstimee { get; set; }
+
+        public DateTime? DerniereActivite { get; set; }
     }
 
     public class CreateQAQuestionDto

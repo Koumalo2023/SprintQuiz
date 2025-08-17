@@ -18,14 +18,12 @@ namespace SprintQuiz.Api.Controllers
             _qaQuestionService = qaQuestionService;
         }
 
-        private Guid GetUserId()
+        private Guid? GetUserId()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-            {
-                throw new UnauthorizedAccessException("ID utilisateur non trouvé ou invalide dans le token.");
-            }
-            return userId;
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            return userIdClaim?.Value != null && Guid.TryParse(userIdClaim.Value, out var userId)
+                ? userId
+                : null;
         }
 
         /// <summary>
@@ -43,14 +41,16 @@ namespace SprintQuiz.Api.Controllers
         /// Récupère une question-réponse par son ID
         /// </summary>
         [HttpGet("{id}")]
-        [AllowAnonymous] // Accessible par tous
+        [AllowAnonymous]
         public async Task<ActionResult<QAQuestionDto>> GetQAQuestionById(Guid id)
         {
-            var question = await _qaQuestionService.GetQAQuestionByIdAsync(id);
-            if (question == null)
-                return NotFound($"Question-réponse avec l'ID {id} non trouvée");
+            var utilisateurId = GetUserId();
+            var dto = await _qaQuestionService.GetQAQuestionByIdAsync(id, utilisateurId);
 
-            return Ok(question);
+            if (dto == null)
+                return NotFound($"Question-réponse avec l'ID {id} non trouvée.");
+
+            return Ok(dto);
         }
 
         /// <summary>
@@ -89,15 +89,17 @@ namespace SprintQuiz.Api.Controllers
         /// Récupère les questions-réponses pour révision de l'utilisateur connecté
         /// </summary>
         [HttpGet("ma-revision/niveau/{niveau}/{niveauId}")]
-        [Authorize] // Nécessite une authentification
-        public async Task<ActionResult<IEnumerable<QAQuestionDto>>> GetMyQAQuestionsForRevision(
-            NiveauEnum niveau, Guid niveauId)
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<QAQuestionDto>>> GetMyQAQuestionsForRevision(NiveauEnum niveau, Guid niveauId)
         {
             try
             {
                 var utilisateurId = GetUserId();
-                var questions = await _qaQuestionService.GetQAQuestionsForRevisionAsync(utilisateurId, niveau, niveauId);
-                return Ok(questions);
+                if (!utilisateurId.HasValue)
+                    return Unauthorized("Utilisateur non authentifié.");
+
+                var consultations = await _qaQuestionService.GetUserConsultationsAsync(utilisateurId.Value);
+                return Ok(consultations);
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -151,10 +153,10 @@ namespace SprintQuiz.Api.Controllers
         }
 
         /// <summary>
-        /// Enregistre une consultation de question-réponse (flashcard)
+        /// Consulte une question-réponse
         /// </summary>
-        [HttpPost("consult")]
-        [Authorize] // Nécessite une authentification pour consulter
+        [HttpPost("consulter")]
+        [Authorize]
         public async Task<ActionResult<ConsultationQADto>> ConsultQAQuestion([FromBody] CreateConsultationQADto consultationDto)
         {
             if (!ModelState.IsValid)
@@ -163,7 +165,10 @@ namespace SprintQuiz.Api.Controllers
             try
             {
                 var utilisateurId = GetUserId();
-                var consultation = await _qaQuestionService.ConsultQAQuestionAsync(utilisateurId, consultationDto);
+                if (!utilisateurId.HasValue)
+                    return Unauthorized("Utilisateur non authentifié.");
+
+                var consultation = await _qaQuestionService.ConsultQAQuestionAsync(utilisateurId.Value, consultationDto);
                 return Ok(consultation);
             }
             catch (ArgumentException ex)
@@ -200,13 +205,16 @@ namespace SprintQuiz.Api.Controllers
         /// Récupère les consultations de l'utilisateur connecté
         /// </summary>
         [HttpGet("mes-consultations")]
-        [Authorize] // Nécessite une authentification
+        [Authorize]
         public async Task<ActionResult<IEnumerable<ConsultationQADto>>> GetMyConsultations()
         {
             try
             {
                 var utilisateurId = GetUserId();
-                var consultations = await _qaQuestionService.GetUserConsultationsAsync(utilisateurId);
+                if (!utilisateurId.HasValue)
+                    return Unauthorized("Utilisateur non authentifié.");
+
+                var consultations = await _qaQuestionService.GetUserConsultationsAsync(utilisateurId.Value);
                 return Ok(consultations);
             }
             catch (UnauthorizedAccessException ex)

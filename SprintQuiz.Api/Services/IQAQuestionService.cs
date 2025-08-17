@@ -6,7 +6,7 @@ namespace SprintQuiz.Api.Services
     public interface IQAQuestionService
     {
         Task<IEnumerable<QAQuestionDto>> GetAllQAQuestionsAsync();
-        Task<QAQuestionDto?> GetQAQuestionByIdAsync(Guid id);
+        Task<QAQuestionDto?> GetQAQuestionByIdAsync(Guid id, Guid? utilisateurId = null);
         Task<IEnumerable<QAQuestionDto>> GetQAQuestionsByNiveauAsync(NiveauEnum niveau, Guid niveauId);
         Task<QAQuestionDto> CreateQAQuestionAsync(CreateQAQuestionDto createQAQuestionDto);
         Task<QAQuestionDto?> UpdateQAQuestionAsync(Guid id, UpdateQAQuestionDto updateQAQuestionDto);

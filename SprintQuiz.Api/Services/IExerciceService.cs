@@ -6,7 +6,7 @@ namespace SprintQuiz.Api.Services
     public interface IExerciceService
     {
         Task<IEnumerable<ExerciceDto>> GetAllExercicesAsync();
-        Task<ExerciceDto?> GetExerciceByIdAsync(Guid id);
+        Task<ExerciceDto?> GetExerciceByIdAsync(Guid id, Guid? utilisateurId = null);
         Task<IEnumerable<ExerciceDto>> GetExercicesByNiveauAsync(NiveauEnum niveau, Guid niveauId);
         Task<ExerciceDto> CreateExerciceAsync(CreateExerciceDto createDto);
         Task<ExerciceDto?> UpdateExerciceAsync(Guid id, UpdateExerciceDto updateDto);
