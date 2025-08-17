@@ -6,8 +6,8 @@ namespace SprintQuiz.Api.Services
     public interface IQuizService
     {
         Task<IEnumerable<QuizDto>> GetAllQuizzesAsync();
-        Task<QuizDto?> GetQuizByIdAsync(Guid id);
-        Task<QuizDto?> GetQuizWithQuestionsAsync(Guid id);
+        Task<QuizDto?> GetQuizByIdAsync(Guid id); 
+        Task<QuizDto?> GetQuizWithQuestionsAsync(Guid id, Guid? utilisateurId = null, bool revision = true);
         Task<IEnumerable<QuizDto>> GetQuizzesByNiveauAsync(NiveauEnum niveau, Guid niveauId);
         Task<QuizDto> CreateQuizAsync(CreateQuizDto createQuizDto);
         Task<QuizDto?> UpdateQuizAsync(Guid id, UpdateQuizDto updateQuizDto);

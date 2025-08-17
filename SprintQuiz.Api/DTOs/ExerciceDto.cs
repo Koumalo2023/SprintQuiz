@@ -11,6 +11,9 @@ namespace SprintQuiz.Api.DTOs
         public NiveauEnum Niveau { get; set; }
         public Guid NiveauId { get; set; }
         public NiveauDifficulte NiveauDifficulte { get; set; }
+        public int DureeEstimee { get; set; }
+        public DateTime? DerniereActivite { get; set; }
+        public DateTime? DerniereModification { get; set; }
         public TypeExercice Type { get; set; }
         public List<string>? Tags { get; set; }
         public DateTime DateCreation { get; set; }
@@ -39,6 +42,7 @@ namespace SprintQuiz.Api.DTOs
         public string? Solution { get; set; }
         public NiveauEnum? Niveau { get; set; }
         public Guid? NiveauId { get; set; }
+        public TypeExercice Type { get; set; }
         public NiveauDifficulte? NiveauDifficulte { get; set; }
         public List<string>? Tags { get; set; }
     }

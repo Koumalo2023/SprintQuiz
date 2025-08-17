@@ -19,22 +19,22 @@ namespace SprintQuiz.Api.Models
 
         [Required]
         public Guid NiveauId { get; set; }
+        public DateTime? DerniereModification { get; set; }
+
+        public List<string>? Tags { get; set; }
 
         [Required]
         public DateTime DateCreation { get; set; } = DateTime.UtcNow;
+        public int DureeEstimee { get; set; } = 0;
+        // --- Nouveaux champs ---
+        public TypeQuiz Type { get; set; } = TypeQuiz.Entrainement;
+        public bool MelangerQuestions { get; set; } = false;
 
-        [Timestamp]
-        [ConcurrencyCheck]
-        public byte[] Version { get; set; }
+        public DateTime Version { get; set; } = DateTime.UtcNow;
 
         // Navigation properties
         public virtual ICollection<QCMQuestion> Questions { get; set; } = new List<QCMQuestion>();
         public virtual ICollection<TentativeQuiz> Tentatives { get; set; } = new List<TentativeQuiz>();
-
-        // Navigation properties conditionnelles selon le niveau
-        public virtual Sprint? Sprint { get; set; }
-        public virtual Module? Module { get; set; }
-        public virtual Cours? Cours { get; set; }
     }
 }
 

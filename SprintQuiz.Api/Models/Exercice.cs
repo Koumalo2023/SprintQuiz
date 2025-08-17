@@ -20,9 +20,11 @@ namespace SprintQuiz.Api.Models
 
         [Required]
         public Guid NiveauId { get; set; }
+        public DateTime? DerniereModification { get; set; }
 
         [Required]
         public NiveauDifficulte NiveauDifficulte { get; set; }
+        public int DureeEstimee { get; set; } = 0;
 
         public TypeExercice Type { get; set; } = TypeExercice.Basique;
 

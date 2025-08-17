@@ -10,6 +10,8 @@ namespace SprintQuiz.Api.DTOs
         public bool Reussi { get; set; }
         public DateTime Date { get; set; }
         public TimeSpan TempsPasse { get; set; }
+        // --- Ajouté pour le mode révision ---
+        public List<ReponseQuestionDto> Reponses { get; set; } = new();
     }
 
     public class CreateTentativeQuizDto

@@ -5,7 +5,11 @@ namespace SprintQuiz.Api.Models
         Cours,
         Module,
         Sprint,
-        Formation
+        Formation,
+        Quiz,
+        QAQuestion,
+        Exercice
+
     }
 
     public enum NiveauDifficulte
@@ -28,6 +32,13 @@ namespace SprintQuiz.Api.Models
         Analyse,       // Analyse de code, situation, problème
         Cas,           // Étude de cas complète (projet mini)
         Defi           // Défi bonus (optionnel, difficile)
+    }
+
+    // Models/TypeQuiz.cs
+    public enum TypeQuiz
+    {
+        Entrainement,
+        Examen
     }
 }
 

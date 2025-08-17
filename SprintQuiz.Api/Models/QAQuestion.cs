@@ -20,6 +20,7 @@ namespace SprintQuiz.Api.Models
 
         [Required]
         public Guid NiveauId { get; set; }
+        public int DureeEstimee { get; set; } = 0;
 
         [Required]
         public NiveauDifficulte NiveauDifficulte { get; set; }
@@ -28,6 +29,8 @@ namespace SprintQuiz.Api.Models
 
         [Required]
         public DateTime DateCreation { get; set; } = DateTime.UtcNow;
+
+        public DateTime? DerniereModification { get; set; }
 
         // Navigation properties
         public virtual ICollection<ConsultationQA> Consultations { get; set; } = new List<ConsultationQA>();

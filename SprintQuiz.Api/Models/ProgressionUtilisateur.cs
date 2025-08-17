@@ -24,6 +24,8 @@ namespace SprintQuiz.Api.Models
 
         [Required]
         public DateTime DerniereActivite { get; set; } = DateTime.UtcNow;
+        [Required]
+        public DateTime DateCreation { get; set; } = DateTime.UtcNow;
 
         // Navigation properties
         public virtual Utilisateur Utilisateur { get; set; } = null!;

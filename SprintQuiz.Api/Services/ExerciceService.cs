@@ -28,13 +28,23 @@ namespace SprintQuiz.Api.Services
             return _mapper.Map<IEnumerable<ExerciceDto>>(exercices);
         }
 
-        public async Task<ExerciceDto?> GetExerciceByIdAsync(Guid id)
+        public async Task<ExerciceDto?> GetExerciceByIdAsync(Guid id, Guid? utilisateurId = null)
         {
-            var exercice = await _context.Exercices
-                .Include(e => e.Indices)
-                .Include(e => e.EtapesResolution)
-                .FirstOrDefaultAsync(e => e.Id == id);
-            return exercice == null ? null : _mapper.Map<ExerciceDto>(exercice);
+            var exercice = await _context.Exercices.FindAsync(id);
+            if (exercice == null) return null;
+
+            var dto = _mapper.Map<ExerciceDto>(exercice);
+
+            if (utilisateurId.HasValue)
+            {
+                var progression = await _context.ProgressionsUtilisateur
+                    .FirstOrDefaultAsync(p => p.UtilisateurId == utilisateurId.Value
+                                           && p.Niveau == NiveauEnum.Exercice
+                                           && p.NiveauId == id);
+                dto.DerniereActivite = progression?.DerniereActivite;
+            }
+
+            return dto;
         }
 
         public async Task<IEnumerable<ExerciceDto>> GetExercicesByNiveauAsync(NiveauEnum niveau, Guid niveauId)
@@ -84,14 +94,14 @@ namespace SprintQuiz.Api.Services
 
         public async Task<ExerciceDto?> UpdateExerciceAsync(Guid id, UpdateExerciceDto updateDto)
         {
-            var exercice = await _context.Exercices
-                .Include(e => e.Indices)
-                .Include(e => e.EtapesResolution)
-                .FirstOrDefaultAsync(e => e.Id == id);
+            var exercice = await _context.Exercices.FindAsync(id);
             if (exercice == null) return null;
 
             _mapper.Map(updateDto, exercice);
+            exercice.DerniereModification = DateTime.UtcNow;
+            exercice.DureeEstimee = CalculateEstimatedTimeForExercice(exercice);
 
+            _context.Exercices.Update(exercice);
             await _context.SaveChangesAsync();
             return _mapper.Map<ExerciceDto>(exercice);
         }
@@ -285,6 +295,18 @@ namespace SprintQuiz.Api.Services
             _context.EtapesResolution.Remove(etape);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        private int CalculateEstimatedTimeForExercice(Exercice exercice)
+        {
+            return exercice.Type switch
+            {
+                TypeExercice.Basique => 2,
+                TypeExercice.Applique => 4,
+                TypeExercice.Analyse or TypeExercice.Cas => 7,
+                TypeExercice.Defi => 10,
+                _ => 2
+            };
         }
     }
 }

@@ -1,3 +1,4 @@
+using SprintQuiz.Api.DTOs;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -30,7 +31,7 @@ namespace SprintQuiz.Api.Models
 
         // Navigation properties
         public virtual Utilisateur Utilisateur { get; set; } = null!;
-        public virtual Quiz Quiz { get; set; } = null!;
+        public virtual Quiz Quiz { get; set; } = null!; 
         public virtual ICollection<ReponseUtilisateurQCM> ReponsesUtilisateur { get; set; } = new List<ReponseUtilisateurQCM>();
     }
 }

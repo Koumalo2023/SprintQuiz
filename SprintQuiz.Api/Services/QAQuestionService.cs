@@ -26,12 +26,23 @@ namespace SprintQuiz.Api.Services
             return _mapper.Map<IEnumerable<QAQuestionDto>>(questions);
         }
 
-        public async Task<QAQuestionDto?> GetQAQuestionByIdAsync(Guid id)
+              public async Task<QAQuestionDto?> GetQAQuestionByIdAsync(Guid id, Guid? utilisateurId = null)
         {
-            var question = await _context.QAQuestions
-                .FirstOrDefaultAsync(q => q.Id == id);
+            var question = await _context.QAQuestions.FindAsync(id);
+            if (question == null) return null;
 
-            return question == null ? null : _mapper.Map<QAQuestionDto>(question);
+            var dto = _mapper.Map<QAQuestionDto>(question);
+
+            if (utilisateurId.HasValue)
+            {
+                var progression = await _context.ProgressionsUtilisateur
+                    .FirstOrDefaultAsync(p => p.UtilisateurId == utilisateurId.Value
+                                           && p.Niveau == NiveauEnum.QAQuestion
+                                           && p.NiveauId == id);
+                dto.DerniereActivite = progression?.DerniereActivite;
+            }
+
+            return dto;
         }
 
         public async Task<IEnumerable<QAQuestionDto>> GetQAQuestionsByNiveauAsync(NiveauEnum niveau, Guid niveauId)
@@ -44,25 +55,31 @@ namespace SprintQuiz.Api.Services
             return _mapper.Map<IEnumerable<QAQuestionDto>>(questions);
         }
 
-        public async Task<QAQuestionDto> CreateQAQuestionAsync(CreateQAQuestionDto createQAQuestionDto)
+         public async Task<QAQuestionDto> CreateQAQuestionAsync(CreateQAQuestionDto createDto)
         {
-            var question = _mapper.Map<QAQuestion>(createQAQuestionDto);
-            
+            var question = _mapper.Map<QAQuestion>(createDto);
+            question.Id = Guid.NewGuid();
+            question.DateCreation = DateTime.UtcNow;
+            question.DureeEstimee = CalculateEstimatedTimeForQA(); 
+
             _context.QAQuestions.Add(question);
             await _context.SaveChangesAsync();
-            
             return _mapper.Map<QAQuestionDto>(question);
         }
 
-        public async Task<QAQuestionDto?> UpdateQAQuestionAsync(Guid id, UpdateQAQuestionDto updateQAQuestionDto)
+        // --- Dans UpdateQAQuestionAsync ---
+        public async Task<QAQuestionDto?> UpdateQAQuestionAsync(Guid id, UpdateQAQuestionDto updateDto)
         {
-            var existingQuestion = await _context.QAQuestions.FindAsync(id);
-            if (existingQuestion == null) return null;
+            var question = await _context.QAQuestions.FindAsync(id);
+            if (question == null) return null;
 
-            _mapper.Map(updateQAQuestionDto, existingQuestion);
+            _mapper.Map(updateDto, question);
+            question.DerniereModification = DateTime.UtcNow;
+            question.DureeEstimee = CalculateEstimatedTimeForQA(); 
+
+            _context.QAQuestions.Update(question);
             await _context.SaveChangesAsync();
-            
-            return _mapper.Map<QAQuestionDto>(existingQuestion);
+            return _mapper.Map<QAQuestionDto>(question);
         }
 
         public async Task<bool> DeleteQAQuestionAsync(Guid id)
@@ -170,6 +187,12 @@ namespace SprintQuiz.Api.Services
             progression.DerniereActivite = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
+        }
+
+        // --- Méthode privée : Calcul de la durée estimée ---
+        private int CalculateEstimatedTimeForQA()
+        {
+            return 1; // 1 minute par flashcard (peut être ajusté)
         }
     }
 }

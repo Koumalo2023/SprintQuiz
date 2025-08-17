@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SprintQuiz.Api.Data;
@@ -12,9 +13,11 @@ using SprintQuiz.Api.Data;
 namespace SprintQuiz.Api.Migrations
 {
     [DbContext(typeof(SprintQuizDbContext))]
-    partial class SprintQuizDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250817150406_UpdateQuizVersionToTimestamp")]
+    partial class UpdateQuizVersionToTimestamp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -584,10 +587,6 @@ namespace SprintQuiz.Api.Migrations
 
                     b.Property<bool>("EstCorrecte")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("Explication")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
 
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uuid");

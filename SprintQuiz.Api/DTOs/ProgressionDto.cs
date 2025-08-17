@@ -11,6 +11,7 @@ namespace SprintQuiz.Api.DTOs
         public string NiveauNom { get; set; } = string.Empty;
         public float PourcentageComplet { get; set; }
         public DateTime DerniereActivite { get; set; }
+        public DateTime DateCreation { get; set; }
     }
 
     public class StatistiquesGlobalesDto

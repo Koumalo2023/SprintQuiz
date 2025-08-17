@@ -19,12 +19,12 @@ namespace SprintQuiz.Api.Controllers
             _exerciceService = exerciceService;
         }
 
-        private Guid GetUserId()
+        private Guid? GetUserId()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-                throw new UnauthorizedAccessException("ID utilisateur non trouvé.");
-            return userId;
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            return userIdClaim?.Value != null && Guid.TryParse(userIdClaim.Value, out var userId)
+                ? userId
+                : null;
         }
 
         // --- CRUD Exercices ---
@@ -38,11 +38,15 @@ namespace SprintQuiz.Api.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<ExerciceDto>> GetById(Guid id)
+        public async Task<ActionResult<ExerciceDto>> GetExerciceById(Guid id)
         {
-            var exercice = await _exerciceService.GetExerciceByIdAsync(id);
-            if (exercice == null) return NotFound();
-            return Ok(exercice);
+            var utilisateurId = GetUserId();
+            var dto = await _exerciceService.GetExerciceByIdAsync(id, utilisateurId);
+
+            if (dto == null)
+                return NotFound($"Exercice avec l'ID {id} non trouvé.");
+
+            return Ok(dto);
         }
 
         [HttpGet("niveau/{niveau}/{niveauId}")]
@@ -59,7 +63,7 @@ namespace SprintQuiz.Api.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var created = await _exerciceService.CreateExerciceAsync(createDto);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            return CreatedAtAction(nameof(GetExerciceById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
@@ -88,8 +92,8 @@ namespace SprintQuiz.Api.Controllers
         {
             try
             {
-                var userId = GetUserId();
-                var exercices = await _exerciceService.GetExercicesForRevisionAsync(userId, niveau, niveauId);
+                var utilisateurId = GetUserId();
+                var exercices = await _exerciceService.GetExercicesForRevisionAsync(utilisateurId.Value, niveau, niveauId);
                 return Ok(exercices);
             }
             catch (UnauthorizedAccessException ex)
@@ -120,7 +124,7 @@ namespace SprintQuiz.Api.Controllers
             try
             {
                 var userId = GetUserId();
-                var result = await _exerciceService.ConsultExerciceAsync(userId, consultationDto);
+                var result = await _exerciceService.ConsultExerciceAsync(userId.Value, consultationDto);
                 return Ok(result);
             }
             catch (UnauthorizedAccessException ex)
@@ -136,7 +140,7 @@ namespace SprintQuiz.Api.Controllers
             try
             {
                 var userId = GetUserId();
-                var consultations = await _exerciceService.GetUserConsultationsAsync(userId);
+                var consultations = await _exerciceService.GetUserConsultationsAsync(userId.Value);
                 return Ok(consultations);
             }
             catch (UnauthorizedAccessException ex)

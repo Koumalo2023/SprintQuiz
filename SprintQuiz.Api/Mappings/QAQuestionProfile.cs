@@ -4,50 +4,40 @@ using SprintQuiz.Api.Models;
 
 namespace SprintQuiz.Api.Mappings
 {
-    public class ExerciceProfile : Profile
+    public class QAQuestionProfile : Profile
     {
-        public ExerciceProfile()
+        public QAQuestionProfile()
         {
-            // Exercice
-            CreateMap<Exercice, ExerciceDto>()
+            // QAQuestion
+            CreateMap<QAQuestion, QAQuestionDto>()
                 .ForMember(dest => dest.DureeEstimee, opt => opt.MapFrom(src => src.DureeEstimee))
                 .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags))
                 .ForMember(dest => dest.DerniereActivite, opt => opt.Ignore());
 
-            CreateMap<CreateExerciceDto, Exercice>()
+            CreateMap<CreateQAQuestionDto, QAQuestion>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.DateCreation, opt => opt.MapFrom(src => DateTime.UtcNow))
                 .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags ?? new List<string>()))
-                .ForMember(dest => dest.DureeEstimee, opt => opt.Ignore()); // Calculé dans le service
+                .ForMember(dest => dest.DureeEstimee, opt => opt.Ignore());
 
-            CreateMap<UpdateExerciceDto, Exercice>()
+            CreateMap<UpdateQAQuestionDto, QAQuestion>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.DateCreation, opt => opt.Ignore())
                 .ForMember(dest => dest.DerniereModification, opt => opt.MapFrom(src => DateTime.UtcNow))
-                .ForMember(dest => dest.Enonce, opt => opt.Condition(src => src.Enonce != null))
-                .ForMember(dest => dest.Solution, opt => opt.Condition(src => src.Solution != null))
+                .ForMember(dest => dest.Question, opt => opt.Condition(src => src.Question != null))
+                .ForMember(dest => dest.Reponse, opt => opt.Condition(src => src.Reponse != null))
                 .ForMember(dest => dest.Niveau, opt => opt.Condition(src => src.Niveau.HasValue))
                 .ForMember(dest => dest.NiveauId, opt => opt.Condition(src => src.NiveauId.HasValue))
                 .ForMember(dest => dest.NiveauDifficulte, opt => opt.Condition(src => src.NiveauDifficulte.HasValue))
-                .ForMember(dest => dest.Type, opt => opt.Condition(src => src.Type != null))
                 .ForMember(dest => dest.Tags, opt => opt.Condition(src => src.Tags != null))
                 .ForMember(dest => dest.DureeEstimee, opt => opt.Ignore());
 
-            // Consultation Exercice
-            CreateMap<ConsultationExercice, ConsultationExerciceDto>();
-            CreateMap<CreateConsultationExerciceDto, ConsultationExercice>()
+            // Consultation QA
+            CreateMap<ConsultationQA, ConsultationQADto>();
+
+            CreateMap<CreateConsultationQADto, ConsultationQA>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.DateConsultation, opt => opt.MapFrom(src => DateTime.UtcNow));
-
-            // Indice
-            CreateMap<Indice, IndiceDto>();
-            CreateMap<CreateIndiceDto, Indice>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()));
-
-            // EtapeResolution
-            CreateMap<EtapeResolution, EtapeResolutionDto>();
-            CreateMap<CreateEtapeResolutionDto, EtapeResolution>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()));
         }
     }
 }
