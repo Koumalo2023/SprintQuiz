@@ -12,6 +12,13 @@ namespace SprintQuiz.Api.Services
         Task<AuthResponseDto?> LoginAsync(LoginDto loginDto);
         Task<StatistiquesGlobalesDto?> GetUserStatisticsAsync(Guid utilisateurId);
         Task<IEnumerable<ProgressionUtilisateurDto>> GetUserProgressionAsync(Guid utilisateurId);
+
+        //Gestion des inscription
+        Task<InscriptionDto> InscrireEtudiantAsync(CreateInscriptionDto dto);
+        Task<IEnumerable<InscriptionDto>> GetInscriptionsParFormationAsync(Guid formationId);
+        Task<bool> DesinscrireEtudiantDeFormationAsync(Guid utilisateurId, Guid formationId);
+        Task<IEnumerable<InscriptionDto>> GetInscriptionsUtilisateurAsync(Guid utilisateurId);
+        Task<bool> EstInscritAFormationAsync(Guid utilisateurId, Guid formationId);
     }
 }
 

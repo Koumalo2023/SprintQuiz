@@ -33,6 +33,8 @@ namespace SprintQuiz.Api.Models
         public virtual Utilisateur Utilisateur { get; set; } = null!;
         public virtual Quiz Quiz { get; set; } = null!; 
         public virtual ICollection<ReponseUtilisateurQCM> ReponsesUtilisateur { get; set; } = new List<ReponseUtilisateurQCM>();
+        public virtual ICollection<ReponseUtilisateurQCM> Reponses { get; set; } = new List<ReponseUtilisateurQCM>();
     }
 }
 
+    

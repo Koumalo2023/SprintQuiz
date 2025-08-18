@@ -26,7 +26,7 @@ namespace SprintQuiz.Api.Services
             return _mapper.Map<IEnumerable<QAQuestionDto>>(questions);
         }
 
-              public async Task<QAQuestionDto?> GetQAQuestionByIdAsync(Guid id, Guid? utilisateurId = null)
+        public async Task<QAQuestionDto?> GetQAQuestionByIdAsync(Guid id, Guid? utilisateurId = null)
         {
             var question = await _context.QAQuestions.FindAsync(id);
             if (question == null) return null;
@@ -40,11 +40,18 @@ namespace SprintQuiz.Api.Services
                                            && p.Niveau == NiveauEnum.QAQuestion
                                            && p.NiveauId == id);
                 dto.DerniereActivite = progression?.DerniereActivite;
+
+                //  Ajout : Statut de maîtrise
+                var derniereConsultation = await _context.ConsultationsQA
+                    .Where(c => c.UtilisateurId == utilisateurId.Value && c.QAQuestionId == id)
+                    .OrderByDescending(c => c.DateConsultation)
+                    .FirstOrDefaultAsync();
+
+                dto.EstCompris = derniereConsultation?.MarqueeComprise;
             }
 
             return dto;
         }
-
         public async Task<IEnumerable<QAQuestionDto>> GetQAQuestionsByNiveauAsync(NiveauEnum niveau, Guid niveauId)
         {
             var questions = await _context.QAQuestions
@@ -55,12 +62,12 @@ namespace SprintQuiz.Api.Services
             return _mapper.Map<IEnumerable<QAQuestionDto>>(questions);
         }
 
-         public async Task<QAQuestionDto> CreateQAQuestionAsync(CreateQAQuestionDto createDto)
+        public async Task<QAQuestionDto> CreateQAQuestionAsync(CreateQAQuestionDto createDto)
         {
             var question = _mapper.Map<QAQuestion>(createDto);
             question.Id = Guid.NewGuid();
             question.DateCreation = DateTime.UtcNow;
-            question.DureeEstimee = CalculateEstimatedTimeForQA(); 
+            question.DureeEstimee = CalculateEstimatedTimeForQA();
 
             _context.QAQuestions.Add(question);
             await _context.SaveChangesAsync();
@@ -75,7 +82,7 @@ namespace SprintQuiz.Api.Services
 
             _mapper.Map(updateDto, question);
             question.DerniereModification = DateTime.UtcNow;
-            question.DureeEstimee = CalculateEstimatedTimeForQA(); 
+            question.DureeEstimee = CalculateEstimatedTimeForQA();
 
             _context.QAQuestions.Update(question);
             await _context.SaveChangesAsync();
@@ -122,26 +129,57 @@ namespace SprintQuiz.Api.Services
             return _mapper.Map<IEnumerable<ConsultationQADto>>(consultations);
         }
 
-        public async Task<IEnumerable<QAQuestionDto>> GetQAQuestionsForRevisionAsync(Guid utilisateurId, NiveauEnum niveau, Guid niveauId)
+        public async Task<IEnumerable<QAQuestionDto>> GetQAQuestionsForRevisionAsync(
+    Guid utilisateurId,
+    NiveauEnum niveau,
+    Guid niveauId,
+    int limit = 10)
         {
-            // Récupérer les questions du niveau demandé
+            // Récupérer les questions du niveau
             var questions = await _context.QAQuestions
                 .Where(q => q.Niveau == niveau && q.NiveauId == niveauId)
                 .ToListAsync();
 
-            // Récupérer les consultations de l'utilisateur pour ces questions
-            var consultedQuestionIds = await _context.ConsultationsQA
-                .Where(c => c.UtilisateurId == utilisateurId)
-                .Select(c => c.QAQuestionId)
+            // Récupérer les consultations de l'utilisateur
+            var questionIds = questions.Select(q => q.Id).ToList();
+
+            var consultations = await _context.ConsultationsQA
+                .Where(c => questionIds.Contains(c.QAQuestionId))
                 .ToListAsync();
 
-            // Prioriser les questions non consultées, puis celles marquées comme non comprises
+            // Associer chaque question à sa dernière consultation
+            var questionConsultMap = consultations
+                .GroupBy(c => c.QAQuestionId)
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(c => c.DateConsultation).First());
+
+            // Tri intelligent :
+            // 1. Non consultées
+            // 2. Consultées mais non comprises
+            // 3. Consultées et comprises → triées par ancienneté (spaced repetition)
             var questionsForRevision = questions
-                .OrderBy(q => consultedQuestionIds.Contains(q.Id) ? 1 : 0) // Non consultées en premier
-                .ThenBy(q => q.NiveauDifficulte)
+                .Select(q =>
+                {
+                    questionConsultMap.TryGetValue(q.Id, out var consult);
+                    return new
+                    {
+                        Question = q,
+                        Consult = consult
+                    };
+                })
+                .OrderBy(x => x.Consult == null ? 0 : (x.Consult.MarqueeComprise == true ? 2 : 1)) // Non consultée < non comprise < comprise
+                .ThenBy(x => x.Consult?.DateConsultation) // Anciennes en premier
+                .Take(limit) //  Séries de révision
+                .Select(x => _mapper.Map<QAQuestionDto>(x.Question))
                 .ToList();
 
-            return _mapper.Map<IEnumerable<QAQuestionDto>>(questionsForRevision);
+            // Ajouter EstCompris
+            foreach (var dto in questionsForRevision)
+            {
+                var consult = questionConsultMap.GetValueOrDefault(dto.Id);
+                dto.EstCompris = consult?.MarqueeComprise;
+            }
+
+            return questionsForRevision;
         }
 
         private async Task UpdateUserProgressionAsync(Guid utilisateurId, Guid qaQuestionId)
@@ -151,8 +189,8 @@ namespace SprintQuiz.Api.Services
 
             // Vérifier si une progression existe déjà pour ce niveau
             var progression = await _context.ProgressionsUtilisateur
-                .FirstOrDefaultAsync(p => p.UtilisateurId == utilisateurId && 
-                                         p.Niveau == question.Niveau && 
+                .FirstOrDefaultAsync(p => p.UtilisateurId == utilisateurId &&
+                                         p.Niveau == question.Niveau &&
                                          p.NiveauId == question.NiveauId);
 
             if (progression == null)
@@ -176,9 +214,9 @@ namespace SprintQuiz.Api.Services
 
             var consultedQuestions = await _context.ConsultationsQA
                 .Where(c => c.UtilisateurId == utilisateurId)
-                .Join(_context.QAQuestions, 
-                      c => c.QAQuestionId, 
-                      q => q.Id, 
+                .Join(_context.QAQuestions,
+                      c => c.QAQuestionId,
+                      q => q.Id,
                       (c, q) => new { c, q })
                 .Where(cq => cq.q.Niveau == question.Niveau && cq.q.NiveauId == question.NiveauId)
                 .CountAsync();

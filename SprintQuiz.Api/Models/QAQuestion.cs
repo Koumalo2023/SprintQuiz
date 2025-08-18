@@ -29,16 +29,14 @@ namespace SprintQuiz.Api.Models
 
         [Required]
         public DateTime DateCreation { get; set; } = DateTime.UtcNow;
+        public bool? EstCompris { get; set; }
 
         public DateTime? DerniereModification { get; set; }
 
         // Navigation properties
         public virtual ICollection<ConsultationQA> Consultations { get; set; } = new List<ConsultationQA>();
 
-        // Navigation properties conditionnelles selon le niveau
-        public virtual Sprint? Sprint { get; set; }
-        public virtual Module? Module { get; set; }
-        public virtual Cours? Cours { get; set; }
+        
     }
 }
 

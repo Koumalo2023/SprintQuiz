@@ -23,7 +23,7 @@ namespace SprintQuiz.Api.Models
         public float PourcentageComplet { get; set; }
 
         [Required]
-        public DateTime DerniereActivite { get; set; } = DateTime.UtcNow;
+        public DateTime? DerniereActivite { get; set; } = DateTime.UtcNow;
         [Required]
         public DateTime DateCreation { get; set; } = DateTime.UtcNow;
 

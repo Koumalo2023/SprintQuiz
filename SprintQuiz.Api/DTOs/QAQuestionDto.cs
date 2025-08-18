@@ -16,6 +16,7 @@ namespace SprintQuiz.Api.DTOs
 
         public int DureeEstimee { get; set; }
 
+        public bool? EstCompris { get; set; }
         public DateTime? DerniereActivite { get; set; }
     }
 
@@ -26,6 +27,7 @@ namespace SprintQuiz.Api.DTOs
         public NiveauEnum Niveau { get; set; }
         public Guid NiveauId { get; set; }
         public NiveauDifficulte NiveauDifficulte { get; set; }
+
         public List<string>? Tags { get; set; }
         public List<CreateQCMOptionDto> Options { get; set; } = new();
     }
@@ -36,6 +38,7 @@ namespace SprintQuiz.Api.DTOs
         public string? Reponse { get; set; }
         public NiveauEnum? Niveau { get; set; }
         public Guid? NiveauId { get; set; }
+
         public NiveauDifficulte? NiveauDifficulte { get; set; }
         public List<string>? Tags { get; set; }
     }
@@ -46,6 +49,7 @@ namespace SprintQuiz.Api.DTOs
         public Guid UtilisateurId { get; set; }
         public Guid QAQuestionId { get; set; }
         public DateTime DateConsultation { get; set; }
+        public bool? EstCompris { get; set; }
         public bool? MarqueeComprise { get; set; }
     }
 

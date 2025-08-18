@@ -40,5 +40,12 @@ namespace SprintQuiz.Api.Models
         Entrainement,
         Examen
     }
+
+    public enum StatutInscription
+    {
+        Actif,
+        Suspendu,
+        Termine
+    }
 }
 

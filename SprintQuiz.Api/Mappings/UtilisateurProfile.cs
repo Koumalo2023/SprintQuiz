@@ -17,6 +17,14 @@ namespace SprintQuiz.Api.Mappings
             CreateMap<UpdateUtilisateurDto, Utilisateur>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
+            CreateMap<InscriptionFormation, InscriptionDto>()
+                .ForMember(dest => dest.NomUtilisateur, opt => opt.MapFrom(src => src.Utilisateur.Nom))
+                .ForMember(dest => dest.NomFormation, opt => opt.MapFrom(src => src.Formation.Nom));
+
+            CreateMap<CreateInscriptionDto, InscriptionFormation>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
+                .ForMember(dest => dest.DateInscription, opt => opt.MapFrom(src => DateTime.UtcNow));
+
             CreateMap<QAQuestion, QAQuestionDto>();
 
             CreateMap<CreateQAQuestionDto, QAQuestion>()

@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SprintQuiz.Api.Data;
 using SprintQuiz.Api.DTOs;
@@ -97,13 +98,28 @@ namespace SprintQuiz.Api.Services
                 ExpiresAt = DateTime.UtcNow.AddMinutes(expirationMinutes)
             };
         }
-
         public async Task<StatistiquesGlobalesDto?> GetUserStatisticsAsync(Guid utilisateurId)
         {
             var stats = await _context.StatistiquesGlobales
                 .FirstOrDefaultAsync(s => s.UtilisateurId == utilisateurId);
 
             return stats == null ? null : _mapper.Map<StatistiquesGlobalesDto>(stats);
+        }
+        private async Task CreateProgressionForFormation(Guid utilisateurId, Guid formationId)
+        {
+            var progression = new ProgressionUtilisateur
+            {
+                Id = Guid.NewGuid(),
+                UtilisateurId = utilisateurId,
+                Niveau = NiveauEnum.Formation,
+                NiveauId = formationId,
+                PourcentageComplet = 0,
+                DerniereActivite = DateTime.UtcNow,
+                DateCreation = DateTime.UtcNow
+            };
+
+            _context.ProgressionsUtilisateur.Add(progression);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<ProgressionUtilisateurDto>> GetUserProgressionAsync(Guid utilisateurId)
@@ -117,6 +133,103 @@ namespace SprintQuiz.Api.Services
 
             return _mapper.Map<IEnumerable<ProgressionUtilisateurDto>>(progressions);
         }
+
+        // Gestion de l'inscription des utulisateur aux formation
+        public async Task<InscriptionDto> InscrireEtudiantAsync(CreateInscriptionDto dto)
+        {
+            // Vérifier que l'utilisateur existe et est un étudiant
+            var utilisateur = await _context.Utilisateurs
+                .FirstOrDefaultAsync(u => u.Id == dto.UtilisateurId);
+            if (utilisateur == null)
+                throw new KeyNotFoundException("Utilisateur non trouvé.");
+
+            if (utilisateur.Role != RoleUtilisateur.Etudiant)
+                throw new InvalidOperationException("Seuls les étudiants peuvent être inscrits à une formation.");
+
+            // Vérifier que la formation existe
+            var formation = await _context.Formations
+                .FirstOrDefaultAsync(f => f.Id == dto.FormationId);
+            if (formation == null)
+                throw new KeyNotFoundException("Formation non trouvée.");
+
+            // Vérifier que l'inscription n'existe pas déjà
+            var existe = await _context.InscriptionFormations
+                .AnyAsync(i => i.UtilisateurId == dto.UtilisateurId && i.FormationId == dto.FormationId);
+            if (existe)
+                throw new InvalidOperationException("Cet étudiant est déjà inscrit à cette formation.");
+
+            // Créer l'inscription
+            var inscription = new InscriptionFormation
+            {
+                Id = Guid.NewGuid(),
+                UtilisateurId = dto.UtilisateurId,
+                FormationId = dto.FormationId,
+                DateInscription = DateTime.UtcNow
+            };
+
+            _context.InscriptionFormations.Add(inscription);
+            await _context.SaveChangesAsync();
+
+            // Créer la progression initiale pour la formation
+            await CreateProgressionForFormation(inscription.UtilisateurId, inscription.FormationId);
+
+            // Charger pour le DTO
+            var dtoResult = _mapper.Map<InscriptionDto>(inscription);
+            dtoResult.NomUtilisateur = utilisateur.Nom;
+            dtoResult.NomFormation = formation.Nom;
+
+            return dtoResult;
+        }
+
+        public async Task<IEnumerable<InscriptionDto>> GetInscriptionsParFormationAsync(Guid formationId)
+        {
+            var inscriptions = await _context.InscriptionFormations
+                .Include(i => i.Utilisateur)
+                .Include(i => i.Formation)
+                .Where(i => i.FormationId == formationId)
+                .ToListAsync();
+
+            return inscriptions.Select(i => new InscriptionDto
+            {
+                Id = i.Id,
+                UtilisateurId = i.UtilisateurId,
+                NomUtilisateur = i.Utilisateur.Nom,
+                FormationId = i.FormationId,
+                NomFormation = i.Formation.Nom,
+                DateInscription = i.DateInscription
+            }).ToList();
+        }
+
+        public async Task<bool> DesinscrireEtudiantDeFormationAsync(Guid utilisateurId, Guid formationId)
+        {
+            var inscription = await _context.InscriptionFormations
+                .FirstOrDefaultAsync(i => i.UtilisateurId == utilisateurId && i.FormationId == formationId);
+
+            if (inscription == null) return false;
+
+            _context.InscriptionFormations.Remove(inscription);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
+        // Services/UtilisateurService.cs
+        public async Task<IEnumerable<InscriptionDto>> GetInscriptionsUtilisateurAsync(Guid utilisateurId)
+        {
+            var inscriptions = await _context.InscriptionFormations
+                .Include(i => i.Formation)
+                .Where(i => i.UtilisateurId == utilisateurId)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<InscriptionDto>>(inscriptions);
+        }
+
+        public async Task<bool> EstInscritAFormationAsync(Guid utilisateurId, Guid formationId)
+        {
+            return await _context.InscriptionFormations
+                .AnyAsync(i => i.UtilisateurId == utilisateurId && i.FormationId == formationId);
+        }
+
 
         private string HashPassword(string password)
         {

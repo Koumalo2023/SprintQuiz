@@ -1,5 +1,6 @@
 using SprintQuiz.Api.DTOs;
 using SprintQuiz.Api.Models;
+using System.Threading.Tasks;
 
 namespace SprintQuiz.Api.Services
 {
@@ -13,7 +14,7 @@ namespace SprintQuiz.Api.Services
         Task<bool> DeleteQAQuestionAsync(Guid id);
         Task<ConsultationQADto> ConsultQAQuestionAsync(Guid utilisateurId, CreateConsultationQADto consultationDto);
         Task<IEnumerable<ConsultationQADto>> GetUserConsultationsAsync(Guid utilisateurId);
-        Task<IEnumerable<QAQuestionDto>> GetQAQuestionsForRevisionAsync(Guid utilisateurId, NiveauEnum niveau, Guid niveauId);
+        Task<IEnumerable<QAQuestionDto>> GetQAQuestionsForRevisionAsync(Guid utilisateurId,NiveauEnum niveau, Guid niveauId, int limit = 10);
     }
 }
 

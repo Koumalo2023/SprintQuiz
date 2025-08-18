@@ -57,7 +57,8 @@ namespace SprintQuiz.Api.DTOs
         public bool Reussi { get; set; }
         public TimeSpan TempsPasse { get; set; }
         public DateTime Date { get; set; }
-        public List<ReponseQuestionDto> Reponses { get; set; } = new();
+        public List<ReponseQuestionDto> Reponses { get; set; } = new(); 
+        public ResumeSessionDto? ResumeSession { get; set; }
     }
 
     public class ReponseQuestionDto
@@ -70,7 +71,16 @@ namespace SprintQuiz.Api.DTOs
         public string? Explication { get; set; } 
     }
 
-    
+    public class ResumeSessionDto
+    {
+        public int QuestionsRevues { get; set; }
+        public double TauxComprehension { get; set; } // 0.0 à 1.0
+        public List<string> PointsForts { get; set; } = new();
+        public List<string> PointsFaibles { get; set; } = new();
+        public string Conseil { get; set; } = string.Empty;
+    }
+
+
 
 }
 

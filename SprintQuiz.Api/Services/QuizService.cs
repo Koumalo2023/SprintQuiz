@@ -333,6 +333,37 @@ namespace SprintQuiz.Services
             // Mettre à jour la progression utilisateur
             await UpdateUserProgressionAfterQuizSubmission(utilisateurId, quiz.Id, tentative.Score);
 
+            // --- 🔧 Génération du résumé de session ---
+            var resume = new ResumeSessionDto
+            {
+                QuestionsRevues = reponsesDto.Count,
+                TauxComprehension = tentative.Score,
+
+                PointsForts = reponsesDto
+                    .Where(r => r.EstCorrecte)
+                    .Take(3)
+                    .Select(r => r.QuestionIntitule.Length > 60
+                        ? r.QuestionIntitule.Substring(0, 57) + "..."
+                        : r.QuestionIntitule)
+                    .ToList(),
+
+                PointsFaibles = reponsesDto
+                    .Where(r => !r.EstCorrecte)
+                    .Take(3)
+                    .Select(r => r.QuestionIntitule.Length > 60
+                        ? r.QuestionIntitule.Substring(0, 57) + "..."
+                        : r.QuestionIntitule)
+                    .ToList(),
+
+                Conseil = tentative.Score switch
+                {
+                    >= 0.9f => "Excellent ! Tu maîtrises parfaitement ce sujet.",
+                    >= 0.7f => "Bon travail ! Continue comme ça.",
+                    >= 0.5f => "Tu progresses, mais reste concentré sur les points faibles.",
+                    _ => "Relis le cours et réessaie. Tu vas y arriver !"
+                }
+            };
+
             return new QuizResultDto
             {
                 QuizId = quiz.Id,
@@ -341,10 +372,10 @@ namespace SprintQuiz.Services
                 Reussi = tentative.Reussi,
                 TempsPasse = tentative.TempsPasse,
                 Date = tentative.Date,
-                Reponses = reponsesDto
+                Reponses = reponsesDto,
+                ResumeSession = resume 
             };
         }
-
         public async Task<IEnumerable<TentativeQuizDto>> GetUserQuizAttemptsAsync(Guid utilisateurId)
         {
             var tentatives = await _context.TentativesQuiz

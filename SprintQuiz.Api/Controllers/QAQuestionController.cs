@@ -75,7 +75,7 @@ namespace SprintQuiz.Api.Controllers
             // Vérifier que l'utilisateur demande ses propres questions ou qu'il est admin
             var currentUserId = GetUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-            
+
             if (currentUserId != utilisateurId && userRole != "Admin")
             {
                 return Forbid("Vous ne pouvez consulter que vos propres questions de révision.");
@@ -88,18 +88,30 @@ namespace SprintQuiz.Api.Controllers
         /// <summary>
         /// Récupère les questions-réponses pour révision de l'utilisateur connecté
         /// </summary>
+        /// <summary>
+        /// Récupère les questions-réponses pour révision de l'utilisateur connecté (avec limite)
+        /// </summary>
         [HttpGet("ma-revision/niveau/{niveau}/{niveauId}")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<QAQuestionDto>>> GetMyQAQuestionsForRevision(NiveauEnum niveau, Guid niveauId)
+        public async Task<ActionResult<IEnumerable<QAQuestionDto>>> GetMyQAQuestionsForRevision(
+    NiveauEnum niveau,
+    Guid niveauId,
+    [FromQuery] int limit = 5)
         {
             try
             {
-                var utilisateurId = GetUserId();
+                var utilisateurId = GetUserId(); // Guid?
+
                 if (!utilisateurId.HasValue)
                     return Unauthorized("Utilisateur non authentifié.");
 
-                var consultations = await _qaQuestionService.GetUserConsultationsAsync(utilisateurId.Value);
-                return Ok(consultations);
+                var questions = await _qaQuestionService.GetQAQuestionsForRevisionAsync(
+                    utilisateurId.Value,  
+                    niveau,
+                    niveauId,
+                    limit);
+
+                return Ok(questions);
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -191,7 +203,7 @@ namespace SprintQuiz.Api.Controllers
             // Vérifier que l'utilisateur demande ses propres consultations ou qu'il est admin
             var currentUserId = GetUserId();
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-            
+
             if (currentUserId != utilisateurId && userRole != "Admin")
             {
                 return Forbid("Vous ne pouvez consulter que vos propres consultations.");

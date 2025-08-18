@@ -235,6 +235,129 @@ namespace SprintQuiz.Api.Controllers
                 return Unauthorized(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Inscrire un étudiant à une formation
+        /// </summary>
+        [HttpPost("inscription")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<InscriptionDto>> Inscrire([FromBody] CreateInscriptionDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var result = await _utilisateurService.InscrireEtudiantAsync(dto);
+                return CreatedAtAction(nameof(GetInscriptionsParFormation), new { formationId = dto.FormationId }, result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Liste des inscriptions pour une formation
+        /// </summary>
+        [HttpGet("formation/{formationId}")]
+        public async Task<ActionResult<IEnumerable<InscriptionDto>>> GetInscriptionsParFormation(Guid formationId)
+        {
+            try
+            {
+                var inscriptions = await _utilisateurService.GetInscriptionsParFormationAsync(formationId);
+                return Ok(inscriptions);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Désinscrire un étudiant d'une formation (Admin uniquement)
+        /// </summary>
+        [HttpDelete("utilisateur/{utilisateurId}/formation/{formationId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> DesinscrireDeFormation(Guid utilisateurId, Guid formationId)
+        {
+            try
+            {
+                var success = await _utilisateurService.DesinscrireEtudiantDeFormationAsync(utilisateurId, formationId);
+                if (!success)
+                    return NotFound("L'étudiant n'est pas inscrit à cette formation.");
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Récupère les inscriptions de l'utilisateur connecté
+        /// </summary>
+        [HttpGet("inscriptions")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<InscriptionDto>>> GetMesInscriptions()
+        {
+            try
+            {
+                var utilisateurId = GetUserId();
+                var inscriptions = await _utilisateurService.GetInscriptionsUtilisateurAsync(utilisateurId);
+                return Ok(inscriptions);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erreur serveur : {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Récupère les inscriptions d'un utilisateur spécifique (Admin ou soi-même)
+        /// </summary>
+        [HttpGet("{id}/inscriptions")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<InscriptionDto>>> GetInscriptionsUtilisateur(Guid id)
+        {
+            try
+            {
+                var currentUserId = GetUserId();
+                var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+                if (currentUserId != id && userRole != "Admin")
+                    return Forbid("Vous ne pouvez consulter que vos propres inscriptions.");
+
+                var inscriptions = await _utilisateurService.GetInscriptionsUtilisateurAsync(id);
+                return Ok(inscriptions);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erreur serveur : {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Vérifie si l'utilisateur est inscrit à une formation
+        /// </summary>
+        [HttpGet("inscriptions/{formationId}")]
+        [Authorize]
+        public async Task<ActionResult<bool>> EstInscritAFormation(Guid formationId)
+        {
+            try
+            {
+                var utilisateurId = GetUserId();
+                var estInscrit = await _utilisateurService.EstInscritAFormationAsync(utilisateurId, formationId);
+                return Ok(estInscrit);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erreur serveur : {ex.Message}");
+            }
+        }
+
     }
+        
 }
 

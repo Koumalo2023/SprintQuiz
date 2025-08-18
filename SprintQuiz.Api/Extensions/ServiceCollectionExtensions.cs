@@ -44,6 +44,8 @@ namespace SprintQuiz.Api.Extensions
 
         private static IServiceCollection AddBusinessServices(this IServiceCollection services)
         {
+            services.AddScoped<DashboardService>();
+            services.AddScoped<IDashboardAdminService, DashboardAdminService>();
             services.AddScoped<ISprintService, SprintService>();
             services.AddScoped<IFormationService, FormationService>();
             services.AddScoped<IModuleService, ModuleService>();

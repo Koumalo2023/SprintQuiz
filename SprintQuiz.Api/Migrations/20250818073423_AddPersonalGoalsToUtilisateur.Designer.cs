@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SprintQuiz.Api.Data;
@@ -12,9 +13,11 @@ using SprintQuiz.Api.Data;
 namespace SprintQuiz.Api.Migrations
 {
     [DbContext(typeof(SprintQuizDbContext))]
-    partial class SprintQuizDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250818073423_AddPersonalGoalsToUtilisateur")]
+    partial class AddPersonalGoalsToUtilisateur
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -378,34 +381,6 @@ namespace SprintQuiz.Api.Migrations
                     b.ToTable("Indices");
                 });
 
-            modelBuilder.Entity("SprintQuiz.Api.Models.InscriptionFormation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("DateInscription")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("FormationId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Statut")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("UtilisateurId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FormationId");
-
-                    b.HasIndex("UtilisateurId", "FormationId")
-                        .IsUnique();
-
-                    b.ToTable("InscriptionFormations");
-                });
-
             modelBuilder.Entity("SprintQuiz.Api.Models.Module", b =>
                 {
                     b.Property<Guid>("Id")
@@ -751,9 +726,6 @@ namespace SprintQuiz.Api.Migrations
                     b.Property<Guid>("TentativeId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("TentativeQuizId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("OptionId");
@@ -761,8 +733,6 @@ namespace SprintQuiz.Api.Migrations
                     b.HasIndex("QuestionId");
 
                     b.HasIndex("TentativeId");
-
-                    b.HasIndex("TentativeQuizId");
 
                     b.ToTable("ReponsesUtilisateurQCM");
                 });
@@ -1057,25 +1027,6 @@ namespace SprintQuiz.Api.Migrations
                     b.Navigation("Exercice");
                 });
 
-            modelBuilder.Entity("SprintQuiz.Api.Models.InscriptionFormation", b =>
-                {
-                    b.HasOne("SprintQuiz.Api.Models.Formation", "Formation")
-                        .WithMany("InscriptionsFormations")
-                        .HasForeignKey("FormationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SprintQuiz.Api.Models.Utilisateur", "Utilisateur")
-                        .WithMany("InscriptionsFormations")
-                        .HasForeignKey("UtilisateurId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Formation");
-
-                    b.Navigation("Utilisateur");
-                });
-
             modelBuilder.Entity("SprintQuiz.Api.Models.Module", b =>
                 {
                     b.HasOne("SprintQuiz.Api.Models.Sprint", "Sprint")
@@ -1192,10 +1143,6 @@ namespace SprintQuiz.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SprintQuiz.Api.Models.TentativeQuiz", null)
-                        .WithMany("Reponses")
-                        .HasForeignKey("TentativeQuizId");
-
                     b.Navigation("Option");
 
                     b.Navigation("Question");
@@ -1266,8 +1213,6 @@ namespace SprintQuiz.Api.Migrations
 
             modelBuilder.Entity("SprintQuiz.Api.Models.Formation", b =>
                 {
-                    b.Navigation("InscriptionsFormations");
-
                     b.Navigation("Progressions");
 
                     b.Navigation("Sprints");
@@ -1325,8 +1270,6 @@ namespace SprintQuiz.Api.Migrations
 
             modelBuilder.Entity("SprintQuiz.Api.Models.TentativeQuiz", b =>
                 {
-                    b.Navigation("Reponses");
-
                     b.Navigation("ReponsesUtilisateur");
                 });
 
@@ -1335,8 +1278,6 @@ namespace SprintQuiz.Api.Migrations
                     b.Navigation("ConsultationsExercice");
 
                     b.Navigation("ConsultationsQA");
-
-                    b.Navigation("InscriptionsFormations");
 
                     b.Navigation("Progressions");
 

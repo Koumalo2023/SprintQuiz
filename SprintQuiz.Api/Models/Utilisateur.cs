@@ -29,14 +29,19 @@ namespace SprintQuiz.Api.Models
         [Required]
         public DateTime DateInscription { get; set; } = DateTime.UtcNow;
 
+        // --- Nouveaux champs : Objectifs personnels ---
+        public int ObjectifHebdomadaireQuiz { get; set; } = 5;
+        public int ObjectifHebdomadaireFlashcards { get; set; } = 10;
+        public int ObjectifHebdomadaireExercices { get; set; } = 7;
+        public TimeSpan ObjectifTempsRevision { get; set; } = TimeSpan.FromMinutes(300);
+
         // Navigation properties
+        public virtual StatistiquesGlobales? StatistiquesGlobales { get; set; }
         public virtual ICollection<TentativeQuiz> TentativesQuiz { get; set; } = new List<TentativeQuiz>();
         public virtual ICollection<ConsultationQA> ConsultationsQA { get; set; } = new List<ConsultationQA>();
         public virtual ICollection<ProgressionUtilisateur> Progressions { get; set; } = new List<ProgressionUtilisateur>();
-        
-        // Ajout manquant : Consultations d'exercices
+        public virtual ICollection<InscriptionFormation> InscriptionsFormations { get; set; } = new List<InscriptionFormation>();
         public virtual ICollection<ConsultationExercice> ConsultationsExercice { get; set; } = new List<ConsultationExercice>();
-        public virtual StatistiquesGlobales? StatistiquesGlobales { get; set; }
     }
 }
 
